@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import android.os.CountDownTimer;
 
 /**
  * Smart Phone Sensing Example 2. Working with sensors.
@@ -65,17 +66,10 @@ public class MainActivity extends Activity implements SensorEventListener {
     private double WALKING_ACC_LIMIT_POS = 0.7;
     private double WALKING_ACC_LIMIT_NEG = -2.0;
 
+    private long blinderWindowSize = 200; //in miliseconds
+    private long endTime;
 
 
-
-
-    /**
-     * Step counter
-     */
-
-    private TextView currentStep;
-    private Sensor stepCounter;
-    private int stepCount;
 
     Button buttonRssi;
 
@@ -91,7 +85,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         titleAcc = (TextView) findViewById(R.id.titleAcc);
         textRssi = (TextView) findViewById(R.id.textRSSI);
 
-        currentStep = (TextView) findViewById(R.id.currentStep);
 
         // Create the button
         buttonRssi = (Button) findViewById(R.id.buttonRSSI);
@@ -179,10 +172,11 @@ public class MainActivity extends Activity implements SensorEventListener {
                 titleAcc.setTextColor(Color.RED);
                 walking = true;
                 acc_max = 0.0;
+                endTime = System.currentTimeMillis() + blinderWindowSize; //won't listen to stops until it ends
             }
         }
 
-        if (aY < WALKING_ACC_LIMIT_NEG && walking) {
+        if (aY < WALKING_ACC_LIMIT_NEG && walking && System.currentTimeMillis() > endTime) {
             if (aY < acc_min) acc_min = aY;   // acceleration negative peak detection
             else {
                 titleAcc.setTextColor(Color.BLACK);
