@@ -14,7 +14,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-import android.os.CountDownTimer;
+import android.os.Environment;
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+import java.io.File;
+
 
 /**
  * Smart Phone Sensing Example 2. Working with sensors.
@@ -56,18 +60,18 @@ public class MainActivity extends Activity implements SensorEventListener {
     private TextView currentX, currentY, currentZ, titleAcc, textRssi;
 
     /**
-     * walking based on linear acceleration
+     * walking detection based on linear acceleration
      */
-    private boolean walking;
+    private boolean walking;  // boolean for making differece between walking and not walking state
 
-    private double acc_max = 0;
-    private double acc_min = 0;
+    private double acc_max = 0; // used for positive acceleration peak detection
+    private double acc_min = 0; // used for negative acceleration peak detection
 
-    private double WALKING_ACC_LIMIT_POS = 0.7;
-    private double WALKING_ACC_LIMIT_NEG = -2.0;
+    private double WALKING_ACC_LIMIT_POS = 0.7; // threshold for changing states, positive acceleration
+    private double WALKING_ACC_LIMIT_NEG = -2.0; // threshold for changing states, negative acceleration
 
-    private long blinderWindowSize = 200; //in miliseconds
-    private long endTime;
+    private long blinderWindowSize = 400; //in miliseconds, not listening to state changes for this tome period
+    private long endTime; // to store the end time of blinder window
 
 
 
@@ -124,6 +128,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
             }
         });
+
     }
 
     // onResume() registers the accelerometer for listening the events
@@ -154,7 +159,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 
 
-        // get the the x,y,z values of the accelerometer, smoothing the values
+        // get the the x,y,z values of the accelerometer, smoothing the values by averaging
         aX = (aX +event.values[0])/2;
         aY = (aY +event.values[1])/2;
         aZ = (aZ +event.values[2])/2;
@@ -165,14 +170,16 @@ public class MainActivity extends Activity implements SensorEventListener {
         currentY.setText(Float.toString(aY));
         currentZ.setText(Double.toString(acc_max));
 
+        writeAccValuesCSV(aY);
 
-        if (aY > WALKING_ACC_LIMIT_POS && !walking) {
+        // signal processing based motion detection
+        /*if (aY > WALKING_ACC_LIMIT_POS && !walking) {
             if (aY > acc_max) acc_max = aY;   // acceleration peak detection
             else {
                 titleAcc.setTextColor(Color.RED);
                 walking = true;
                 acc_max = 0.0;
-                endTime = System.currentTimeMillis() + blinderWindowSize; //won't listen to stops until it ends
+                endTime = System.currentTimeMillis() + blinderWindowSize; //won't listen to negative acc until time ends
             }
         }
 
@@ -183,6 +190,43 @@ public class MainActivity extends Activity implements SensorEventListener {
                 walking = false;
                 acc_min = 0.0;
             }
+        }*/
+    }
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
         }
+        return false;
+    }
+
+
+    public void writeAccValuesCSV(double aY) {
+
+        try {
+
+            File sdCard = Environment.getExternalStorageDirectory();
+            File dir = new File(sdCard.getAbsolutePath() + "/localization");
+            dir.mkdir();
+
+            File file = new File(dir, "output.csv");
+            FileOutputStream f = new FileOutputStream(file,true);
+
+            String row = "AccelY:"+aY+',';
+
+            try {
+                f.write(row.getBytes());
+                f.flush();
+                f.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }
