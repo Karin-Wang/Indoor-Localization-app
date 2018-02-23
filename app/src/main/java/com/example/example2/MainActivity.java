@@ -60,6 +60,11 @@ public class MainActivity extends Activity implements SensorEventListener {
     private TextView currentX, currentY, currentZ, titleAcc, textRssi;
 
     /**
+     * timestamp for sensor valies
+     */
+    private long timestamp;
+
+    /**
      * walking detection based on linear acceleration
      */
     private boolean walking;  // boolean for making differece between walking and not walking state
@@ -164,13 +169,15 @@ public class MainActivity extends Activity implements SensorEventListener {
         aY = (aY +event.values[1])/2;
         aZ = (aZ +event.values[2])/2;
 
+        timestamp = event.timestamp;
+
 
         // display the current x,y,z accelerometer values
         currentX.setText(Double.toString(acc_min));
         currentY.setText(Float.toString(aY));
         currentZ.setText(Double.toString(acc_max));
 
-        writeAccValuesCSV(aY);
+        writeAccValuesCSV(aY,timestamp);
 
         // signal processing based motion detection
         /*if (aY > WALKING_ACC_LIMIT_POS && !walking) {
@@ -202,7 +209,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
 
-    public void writeAccValuesCSV(double aY) {
+    public void writeAccValuesCSV(double aY,long timestamp) {
 
         try {
 
@@ -213,7 +220,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             File file = new File(dir, "output.csv");
             FileOutputStream f = new FileOutputStream(file,true);
 
-            String row = "AccelY:"+aY+',';
+            String row = String.valueOf(aY)+" , "+timestamp+"\n";
 
             try {
                 f.write(row.getBytes());
