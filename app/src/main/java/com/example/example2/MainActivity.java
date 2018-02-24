@@ -59,7 +59,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     /**
      * Text fields to show the sensor values.
      */
-    private TextView currentX, currentY, currentZ, titleAcc, textRssi;
+    private TextView currentY, titleAcc, textRssi;
 
     /**
      * timestamp for sensor valies
@@ -82,9 +82,10 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     String fileName; // filename with current time
 
-
-
     Button buttonRssi;
+    Button buttonAccRecord;
+
+    private boolean isRecord = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -92,15 +93,16 @@ public class MainActivity extends Activity implements SensorEventListener {
         setContentView(R.layout.activity_main);
 
         // Create the text views.
-        currentX = (TextView) findViewById(R.id.currentX);
         currentY = (TextView) findViewById(R.id.currentY);
-        currentZ = (TextView) findViewById(R.id.currentZ);
         titleAcc = (TextView) findViewById(R.id.titleAcc);
         textRssi = (TextView) findViewById(R.id.textRSSI);
 
 
         // Create the button
         buttonRssi = (Button) findViewById(R.id.buttonRSSI);
+
+        // Create acceleration button recorder
+        buttonAccRecord = (Button) findViewById(R.id.buttonAccRecord);
 
         // Set the sensor manager
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -138,7 +140,27 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         });
 
-        String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        // Create a click listener for acc recorder button.
+        buttonAccRecord.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (!isRecord) {
+                    isRecord = true;
+                    buttonAccRecord.setText("STOP RECORD");
+                    currentY.setTextColor(Color.RED);
+
+                } else {
+                    isRecord = false;
+                    currentY.setTextColor(Color.BLACK);
+                    buttonAccRecord.setText("START RECORD");
+                    String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()); // time at first call
+                    fileName = "accData_" + curTime + ".csv";
+                }
+            }
+        });
+
+        String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()); // time at first call
         fileName = "accData_" + curTime + ".csv";
 
     }
@@ -165,26 +187,19 @@ public class MainActivity extends Activity implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
 
 
-        currentX.setText("0.0");
         currentY.setText("0.0");
-        currentZ.setText("0.0");
 
 
-
-        // get the the x,y,z values of the accelerometer, smoothing the values by averaging
-        aX = (aX +event.values[0])/2;
-        aY = (aY +event.values[1])/2;
-        aZ = (aZ +event.values[2])/2;
+        // get the the y values of the accelerometer
+        aY =event.values[1];
 
         timestamp = event.timestamp;
 
 
         // display the current x,y,z accelerometer values
-        currentX.setText(Double.toString(acc_min));
         currentY.setText(Float.toString(aY));
-        currentZ.setText(Double.toString(acc_max));
 
-        writeAccValuesCSV(aY,timestamp);
+        if(isRecord)writeAccValuesCSV(aY,timestamp);
 
         // signal processing based motion detection
         /*if (aY > WALKING_ACC_LIMIT_POS && !walking) {

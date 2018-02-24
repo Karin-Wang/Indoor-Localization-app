@@ -28,19 +28,9 @@
         android:layout_height="wrap_content"
         android:text="Get RSSI" />
 
-    <TextView
-        android:id="@+id/titleAcc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="30dp"
-        android:text="Linear acceleration Value"
-        android:textSize="20dp" />
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="102dp"
+        android:layout_height="wrap_content"
         android:background="#ffffff"
         android:gravity="center|top"
         android:orientation="horizontal">
@@ -48,38 +38,13 @@
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.33"
+            android:layout_weight="0.5"
             android:background="#ffffff"
             android:gravity="center"
             android:orientation="vertical">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:text="Y-min"
-                android:textSize="15dp" />
-
-            <TextView
-                android:id="@+id/currentX"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:text="0.0"
-                android:textSize="15dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.33"
-            android:background="#ffffff"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
+                android:id="@+id/titleAcc"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -99,29 +64,19 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.33"
-            android:background="#ffffff"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5"
             android:gravity="center"
-            android:orientation="vertical">
+            android:orientation="horizontal">
 
-            <TextView
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/buttonAccRecord"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:text="Y-max"
-                android:textSize="15dp" />
-
-            <TextView
-                android:id="@+id/currentZ"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:text="0.0"
-                android:textSize="15dp" />
+                android:layout_weight="1"
+                android:text="Start recording" />
         </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
