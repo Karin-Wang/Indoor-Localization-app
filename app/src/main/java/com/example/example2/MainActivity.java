@@ -18,6 +18,8 @@ import android.os.Environment;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 /**
@@ -78,6 +80,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     private long blinderWindowSize = 400; //in miliseconds, not listening to state changes for this tome period
     private long endTime; // to store the end time of blinder window
 
+    String fileName; // filename with current time
+
 
 
     Button buttonRssi;
@@ -133,6 +137,9 @@ public class MainActivity extends Activity implements SensorEventListener {
 
             }
         });
+
+        String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        fileName = "accData_" + curTime + ".csv";
 
     }
 
@@ -217,7 +224,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             File dir = new File(sdCard.getAbsolutePath() + "/localization");
             dir.mkdir();
 
-            File file = new File(dir, "output.csv");
+            File file = new File(dir, fileName);
             FileOutputStream f = new FileOutputStream(file,true);
 
             String row = String.valueOf(aY)+" , "+timestamp+"\n";
