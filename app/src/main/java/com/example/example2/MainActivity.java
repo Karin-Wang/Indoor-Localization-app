@@ -1,6 +1,7 @@
 package com.example.example2;
 
 import android.app.Activity;
+import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -20,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 
 /**
@@ -80,7 +82,10 @@ public class MainActivity extends Activity implements SensorEventListener {
     private long blinderWindowSize = 400; //in miliseconds, not listening to state changes for this tome period
     private long endTime; // to store the end time of blinder window
 
-    String fileName; // filename with current time
+    String fileNameAcc; // acceleration  data filename with current time
+
+    String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()); 
+    String fileNameWifi = "wifiData_" + curTime + ".csv";
 
     Button buttonRssi;
     Button buttonAccRecord;
@@ -130,13 +135,22 @@ public class MainActivity extends Activity implements SensorEventListener {
         buttonRssi.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                // get the wifi info.
-                wifiInfo = wifiManager.getConnectionInfo();
-                // update the text.
-                textRssi.setText("\n\tSSID = " + wifiInfo.getSSID()
-                        + "\n\tRSSI = " + wifiInfo.getRssi()
-                        + "\n\tLocal Time = " + System.currentTimeMillis());
-
+                // Set text.
+                textRssi.setText("\n\tScan all access points:");
+                // Set wifi manager.
+                wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                // Start a wifi scan.
+                wifiManager.startScan();
+                // Store results in a list.
+                List<ScanResult> scanResults = wifiManager.getScanResults();
+                // Write results to a label
+                for (ScanResult scanResult : scanResults) {
+                    textRssi.setText(textRssi.getText() + "\n\tBSSID = "
+                            + scanResult.BSSID + "    RSSI = "
+                            + scanResult.level + "dBm");
+                String row = scanResult.BSSID+" , " + scanResult.level + " , " + String.valueOf(scanResult.timestamp) + "\n";
+                writeWifiValuesCSV(row);
+                }
             }
         });
 
@@ -155,13 +169,14 @@ public class MainActivity extends Activity implements SensorEventListener {
                     currentY.setTextColor(Color.BLACK);
                     buttonAccRecord.setText("START RECORD");
                     String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()); // time at first call
-                    fileName = "accData_" + curTime + ".csv";
+                    fileNameAcc = "accData_" + curTime + ".csv";
                 }
             }
         });
 
         String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()); // time at first call
-        fileName = "accData_" + curTime + ".csv";
+        fileNameAcc = "accData_" + curTime + ".csv";
+
 
     }
 
@@ -239,10 +254,37 @@ public class MainActivity extends Activity implements SensorEventListener {
             File dir = new File(sdCard.getAbsolutePath() + "/localization");
             dir.mkdir();
 
-            File file = new File(dir, fileName);
+            File file = new File(dir, fileNameAcc);
             FileOutputStream f = new FileOutputStream(file,true);
 
             String row = String.valueOf(aY)+" , "+timestamp+"\n";
+
+            try {
+                f.write(row.getBytes());
+                f.flush();
+                f.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void writeWifiValuesCSV(String row) {
+
+        try {
+
+            File sdCard = Environment.getExternalStorageDirectory();
+            File dir = new File(sdCard.getAbsolutePath() + "/localization");
+            dir.mkdir();
+
+            File file = new File(dir, fileNameWifi);
+            FileOutputStream f = new FileOutputStream(file,true);
+
 
             try {
                 f.write(row.getBytes());
