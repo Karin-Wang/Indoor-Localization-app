@@ -19,9 +19,17 @@ import android.os.Environment;
 import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+
+
 
 
 /**
@@ -214,6 +222,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             e.printStackTrace();
         }
 
+        readAccTrainCSV(); // read trained acceleration data from .csv file
 
     }
 
@@ -277,14 +286,6 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         }*/
     }
-    /* Checks if external storage is available for read and write */
-    public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
-    }
 
 
     public void writeAccValuesCSV(double aY, double aZ,long timestamp) {
@@ -340,5 +341,61 @@ public class MainActivity extends Activity implements SensorEventListener {
             e.printStackTrace();
         }
 
+    }
+
+    public void accelerationKNN() {
+
+    }
+
+    public void readAccTrainCSV(){
+
+        if (isExternalStorageWritable()){
+
+            String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/traindata.csv";
+
+            try{
+                FileInputStream csvInput = new FileInputStream(path);
+                List accTrainData =  csvread(csvInput);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            
+
+
+        }
+    }
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    public List csvread(InputStream inputStream){
+        List resultList = new ArrayList();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        try {
+            String csvLine;
+            while ((csvLine = reader.readLine()) != null) {
+                String[] row = csvLine.split(",");
+                resultList.add(row);
+            }
+        }
+        catch (IOException ex) {
+            throw new RuntimeException("Error in reading CSV file: "+ex);
+        }
+        finally {
+            try {
+                inputStream.close();
+            }
+            catch (IOException e) {
+                throw new RuntimeException("Error while closing input stream: "+e);
+            }
+        }
+        return resultList;
     }
 }
