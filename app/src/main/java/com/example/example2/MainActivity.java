@@ -61,7 +61,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     /**
      * Text fields to show the sensor values.
      */
-    private TextView currentY, titleAcc, textRssi;
+    private TextView currentY, currentZ, titleAcc, textRssi;
 
     /**
      * timestamp for sensor valies
@@ -84,7 +84,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     String fileNameAcc; // acceleration  data filename with current time
 
-    String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()); 
+    String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     String fileNameWifi = "wifiData_" + curTime + ".csv";
 
     Button buttonRssi;
@@ -99,6 +99,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         // Create the text views.
         currentY = (TextView) findViewById(R.id.currentY);
+        currentZ = (TextView) findViewById(R.id.currentZ);
         titleAcc = (TextView) findViewById(R.id.titleAcc);
         textRssi = (TextView) findViewById(R.id.textRSSI);
 
@@ -163,19 +164,55 @@ public class MainActivity extends Activity implements SensorEventListener {
                     isRecord = true;
                     buttonAccRecord.setText("STOP RECORD");
                     currentY.setTextColor(Color.RED);
+                    currentZ.setTextColor(Color.RED);
 
                 } else {
                     isRecord = false;
                     currentY.setTextColor(Color.BLACK);
+                    currentZ.setTextColor(Color.BLACK);
+
                     buttonAccRecord.setText("START RECORD");
                     String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()); // time at first call
                     fileNameAcc = "accData_" + curTime + ".csv";
+
+                    String row ="Acceleration Y, Accelearion Z, timestamp\n";   // write header to csv file
+
+                    try {
+                        File sdCard = Environment.getExternalStorageDirectory();
+                        File dir = new File(sdCard.getAbsolutePath() + "/localization");
+                        dir.mkdir();
+
+                        File file = new File(dir, fileNameAcc);
+                        FileOutputStream f = new FileOutputStream(file,true);
+                        f.write(row.getBytes());
+                        f.flush();
+                        f.close();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         });
 
         String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()); // time at first call
         fileNameAcc = "accData_" + curTime + ".csv";
+
+
+        String row ="Acceleration Y, Accelearion Z, timestamp\n";   // write header to csv file
+
+        try {
+            File sdCard = Environment.getExternalStorageDirectory();
+            File dir = new File(sdCard.getAbsolutePath() + "/localization");
+            dir.mkdir();
+
+            File file = new File(dir, fileNameAcc);
+            FileOutputStream f = new FileOutputStream(file,true);
+            f.write(row.getBytes());
+            f.flush();
+            f.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 
     }
@@ -203,18 +240,22 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 
         currentY.setText("0.0");
+        currentZ.setText("0.0");
 
 
         // get the the y values of the accelerometer
+        aX =event.values[0];
         aY =event.values[1];
+        aZ =event.values[2];
 
         timestamp = event.timestamp;
 
 
         // display the current x,y,z accelerometer values
         currentY.setText(Float.toString(aY));
+        currentZ.setText(Float.toString(aZ));
 
-        if(isRecord)writeAccValuesCSV(aY,timestamp);
+        if(isRecord)writeAccValuesCSV(aY,aZ,timestamp);
 
         // signal processing based motion detection
         /*if (aY > WALKING_ACC_LIMIT_POS && !walking) {
@@ -246,7 +287,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
 
-    public void writeAccValuesCSV(double aY,long timestamp) {
+    public void writeAccValuesCSV(double aY, double aZ,long timestamp) {
 
         try {
 
@@ -257,7 +298,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             File file = new File(dir, fileNameAcc);
             FileOutputStream f = new FileOutputStream(file,true);
 
-            String row = String.valueOf(aY)+" , "+timestamp+"\n";
+            String row = String.valueOf(aY)+" , "+ String.valueOf(aZ)+" , "+timestamp+"\n";
 
             try {
                 f.write(row.getBytes());
