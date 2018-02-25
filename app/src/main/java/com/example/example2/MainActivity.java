@@ -22,7 +22,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.io.BufferedReader;
@@ -99,6 +101,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     Button buttonAccRecord;
 
     private boolean isRecord = false;
+    List accTrainCSV = new ArrayList();
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -222,8 +226,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             e.printStackTrace();
         }
 
-        readAccTrainCSV(); // read trained acceleration data from .csv file
-
+        accTrainCSV = readAccTrainCSV(); // read trained acceleration data from .csv file
     }
 
     // onResume() registers the accelerometer for listening the events
@@ -263,6 +266,8 @@ public class MainActivity extends Activity implements SensorEventListener {
         // display the current x,y,z accelerometer values
         currentY.setText(Float.toString(aY));
         currentZ.setText(Float.toString(aZ));
+
+        accelerationKNN(aY,aZ);
 
         if(isRecord)writeAccValuesCSV(aY,aZ,timestamp);
 
@@ -309,11 +314,9 @@ public class MainActivity extends Activity implements SensorEventListener {
                 e.printStackTrace();
             }
 
-
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
     public void writeWifiValuesCSV(String row) {
@@ -336,18 +339,61 @@ public class MainActivity extends Activity implements SensorEventListener {
                 e.printStackTrace();
             }
 
-
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
 
-    public void accelerationKNN() {
+    public void accelerationKNN(float aY,float aZ) {
 
+        short KValue = 5; // K for KNN
+
+        ArrayList KNNList = new ArrayList(KValue);
+        ArrayList clusters = new ArrayList(KValue);
+
+        for (int i = 0; i < accTrainCSV.size(); i++) {   //iterate through the training values
+
+            String[] line = (String[]) accTrainCSV.get(i);
+
+            float aYTrain = Float.parseFloat(line[0]);
+            float aZTrain = Float.parseFloat(line[1]);
+            int walking = Integer.parseInt(line[2]);
+
+            float distance = eucledianDistance(aY, aZ, aYTrain, aZTrain);
+
+            if (i < KValue) {
+                KNNList.add(i, distance);
+                clusters.add(i, walking);
+            } else {
+
+                float min = (float) Collections.min(KNNList);
+
+                float a = min;
+
+                if (distance < (float) Collections.min(KNNList)) {
+                    KNNList.set(KNNList.indexOf(Collections.max(KNNList)), distance);
+                    clusters.set(KNNList.indexOf(Collections.max(KNNList)), walking);
+                }
+            }
+        }
+
+        if (Collections.frequency(clusters, 0) > 2) {
+            textRssi.setHighlightColor(Color.BLACK);
+        } else {
+            textRssi.setHighlightColor(Color.RED);
+        }
     }
 
-    public void readAccTrainCSV(){
+
+    float eucledianDistance (float aY, float aZ, float listAY, float listAZ){
+
+        return (float)Math.sqrt((listAY-aY)*(listAY-aY)+(listAZ-aZ)*(listAZ-aZ));
+    }
+
+    public List readAccTrainCSV(){
+
+        List accTrainData = new ArrayList();
 
         if (isExternalStorageWritable()){
 
@@ -355,15 +401,13 @@ public class MainActivity extends Activity implements SensorEventListener {
 
             try{
                 FileInputStream csvInput = new FileInputStream(path);
-                List accTrainData =  csvread(csvInput);
+                accTrainData =  csvread(csvInput);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            
-
-
         }
+
+        return accTrainData;
     }
 
     /* Checks if external storage is available for read and write */
