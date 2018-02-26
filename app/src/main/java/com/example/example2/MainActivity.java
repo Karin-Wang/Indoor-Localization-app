@@ -267,8 +267,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 
         sampleCounter ++;   // count samples in a window
-        sumY += aY;         // we collect sum to get average, then use it for KNN
-        sumZ += aZ;
+        sumY += Math.abs(aY);         // we collect sum to get average, then use it for KNN
+        sumZ += Math.abs(aZ);
 
         if (sampleCounter == WINDOW_SIZE) {
             accelerationKNN(sumY / WINDOW_SIZE, sumZ / WINDOW_SIZE);    // send the averages to KNN
