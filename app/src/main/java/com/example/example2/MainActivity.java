@@ -21,6 +21,7 @@ import java.io.FileInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
@@ -30,6 +31,8 @@ import java.util.ArrayList;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 
 
@@ -148,18 +151,44 @@ public class MainActivity extends Activity implements SensorEventListener {
                 textRssi.setText("\n\tScan all access points:");
                 // Set wifi manager.
                 wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                // Start a wifi scan.
-                wifiManager.startScan();
-                // Store results in a list.
-                List<ScanResult> scanResults = wifiManager.getScanResults();
-                // Write results to a label
-                for (ScanResult scanResult : scanResults) {
-                    textRssi.setText(textRssi.getText() + "\n\tBSSID = "
-                            + scanResult.BSSID + "    RSSI = "
-                            + scanResult.level + "dBm");
-                String row = scanResult.BSSID+" , " + scanResult.level + " , " + String.valueOf(scanResult.timestamp) + "\n";
-                writeWifiValuesCSV(row);
+                // Start a wifi scan
+                Map<String, ArrayList<Integer>> wifiData = new HashMap<>();
+                for (int i=0; i<10; i++) {
+                    wifiManager.startScan();
+                    // Store results in a list.
+                    List<ScanResult> scanResults = wifiManager.getScanResults();
+                    for (ScanResult scanResult : scanResults) {
+                        textRssi.setText(textRssi.getText() + "\n\tBSSID = "
+                                + scanResult.BSSID + "    RSSI = "
+                                + scanResult.level + "dBm");
+                        if (wifiData.containsKey(scanResult.BSSID)) {
+                            //key exists
+                            wifiData.get(scanResult.BSSID).add(scanResult.level);
+                        } else {
+                            //key does not exists
+                            ArrayList<Integer> wifiDataList = new ArrayList<>();
+                            wifiDataList.add(scanResult.level);
+                            wifiData.put(scanResult.BSSID, wifiDataList);
+                        }
+                    }
                 }
+                for (Map.Entry<String, ArrayList<Integer>> entry : wifiData.entrySet()) {
+                    String row  = entry.getKey() + ",";
+                    Iterator<Integer> iterator = entry.getValue().iterator();
+                    while (iterator.hasNext()) {
+                        row += iterator.next() + ",";
+                    }
+                    row  = row.substring(0,row.length()-1)+ "\n";
+                    writeWifiValuesCSV(row);
+                }
+
+//                for (ScanResult scanResult : scanResults) {
+//                    textRssi.setText(textRssi.getText() + "\n\tBSSID = "
+//                            + scanResult.BSSID + "    RSSI = "
+//                            + scanResult.level + "dBm");
+//                String row = scanResult.BSSID+" , " + scanResult.level + " , " + String.valueOf(scanResult.timestamp) + "\n";
+//                writeWifiValuesCSV(row);
+//                }
             }
         });
 
