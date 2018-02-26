@@ -71,7 +71,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     /**
      * Text fields to show the sensor values.
      */
-    private TextView currentY, currentZ, titleAcc, textRssi;
+    private TextView currentY, currentZ, titleAcc, textRssi, textWalking;
 
     /**
      * timestamp for sensor valies
@@ -81,16 +81,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     /**
      * walking detection based on linear acceleration
      */
-    private boolean walking;  // boolean for making differece between walking and not walking state
-
-    private double acc_max = 0; // used for positive acceleration peak detection
-    private double acc_min = 0; // used for negative acceleration peak detection
-
-    private double WALKING_ACC_LIMIT_POS = 0.7; // threshold for changing states, positive acceleration
-    private double WALKING_ACC_LIMIT_NEG = -2.0; // threshold for changing states, negative acceleration
-
-    private long blinderWindowSize = 400; //in miliseconds, not listening to state changes for this tome period
-    private long endTime; // to store the end time of blinder window
 
     String fileNameAcc; // acceleration  data filename with current time
 
@@ -102,6 +92,11 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     private boolean isRecord = false;
     List accTrainCSV = new ArrayList();
+    int WINDOW_SIZE = 25; // acceleration detection, number of samples
+
+    float sumY = 0;  // for window average counting
+    float sumZ = 0;
+    int sampleCounter;
 
 
     @Override
@@ -114,6 +109,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         currentZ = (TextView) findViewById(R.id.currentZ);
         titleAcc = (TextView) findViewById(R.id.titleAcc);
         textRssi = (TextView) findViewById(R.id.textRSSI);
+        textWalking = (TextView) findViewById(R.id.walkText);
 
 
         // Create the button
@@ -250,7 +246,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-
         currentY.setText("0.0");
         currentZ.setText("0.0");
 
@@ -267,29 +262,20 @@ public class MainActivity extends Activity implements SensorEventListener {
         currentY.setText(Float.toString(aY));
         currentZ.setText(Float.toString(aZ));
 
-        accelerationKNN(aY,aZ);
 
         if(isRecord)writeAccValuesCSV(aY,aZ,timestamp);
 
-        // signal processing based motion detection
-        /*if (aY > WALKING_ACC_LIMIT_POS && !walking) {
-            if (aY > acc_max) acc_max = aY;   // acceleration peak detection
-            else {
-                titleAcc.setTextColor(Color.RED);
-                walking = true;
-                acc_max = 0.0;
-                endTime = System.currentTimeMillis() + blinderWindowSize; //won't listen to negative acc until time ends
-            }
-        }
 
-        if (aY < WALKING_ACC_LIMIT_NEG && walking && System.currentTimeMillis() > endTime) {
-            if (aY < acc_min) acc_min = aY;   // acceleration negative peak detection
-            else {
-                titleAcc.setTextColor(Color.BLACK);
-                walking = false;
-                acc_min = 0.0;
-            }
-        }*/
+        sampleCounter ++;   // count samples in a window
+        sumY += aY;         // we collect sum to get average, then use it for KNN
+        sumZ += aZ;
+
+        if (sampleCounter == WINDOW_SIZE) {
+            accelerationKNN(sumY / WINDOW_SIZE, sumZ / WINDOW_SIZE);    // send the averages to KNN
+            sampleCounter = 0;
+            sumY = 0;
+            sumZ= 0;
+        }
     }
 
 
@@ -345,7 +331,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     }
 
-    public void accelerationKNN(float aY,float aZ) {
+    public void accelerationKNN(float avgY,float avgZ) {
 
         short KValue = 5; // K for KNN
 
@@ -360,7 +346,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             float aZTrain = Float.parseFloat(line[1]);
             int walking = Integer.parseInt(line[2]);
 
-            float distance = eucledianDistance(aY, aZ, aYTrain, aZTrain);
+            float distance = eucledianDistance(avgY, avgZ, aYTrain, aZTrain);
 
             if (i < KValue) {
                 KNNList.add(i, distance);
@@ -379,9 +365,9 @@ public class MainActivity extends Activity implements SensorEventListener {
         }
 
         if (Collections.frequency(clusters, 0) > 2) {
-            textRssi.setHighlightColor(Color.BLACK);
+            textWalking.setText("Standing");
         } else {
-            textRssi.setHighlightColor(Color.RED);
+            textWalking.setText("Walking");
         }
     }
 
