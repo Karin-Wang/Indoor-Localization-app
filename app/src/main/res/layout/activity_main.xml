@@ -18,116 +18,39 @@
 
     <TextView
         android:id="@+id/textRSSI"
-        android:layout_width="300dp"
-        android:layout_height="322dp"
-        android:text="" />
-
-    <Button
-        android:id="@+id/buttonRSSI"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Scan and Save RSSI" />
+        android:layout_height="30dp"
+        android:text="Get train data from each cell by Clicking the button." />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#ffffff"
-        android:gravity="center|top"
+        android:layout_height="200dp"
         android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="0dp"
+        <Button
+            android:id="@+id/buttonRSSI"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="0.33"
-            android:background="#ffffff"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/titleAcc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:text="Y-Axis"
-                android:textSize="15dp" />
-
-            <TextView
-                android:id="@+id/currentY"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:text="0.0"
-                android:textSize="15dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.33"
-            android:background="#ffffff"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/titleAcc2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:text="Z-Axis"
-                android:textSize="15dp" />
-
-            <TextView
-                android:id="@+id/currentZ"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:text="0.0"
-                android:textSize="15dp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="Cell 1" />
+        <Button
+            android:id="@+id/buttonRSSI1"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="0.33"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/buttonAccRecord"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Start recording" />
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="71dp"
-        android:layout_weight="0.33"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_weight="2"
-            android:gravity="center_vertical|center_horizontal"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/walkText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Standing"
-                android:textSize="24sp" />
-        </LinearLayout>
-
+            android:layout_weight="1"
+            android:text="Cell 2" />
+        <Button
+            android:id="@+id/buttonRSSI2"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Cell 3" />
+        <Button
+            android:id="@+id/buttonRSSI3"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Cell 4" />
     </LinearLayout>
 
 </LinearLayout>

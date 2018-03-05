@@ -2,11 +2,9 @@ package com.example.example2;
 
 import android.app.Activity;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.content.Context;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -17,22 +15,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.os.Environment;
 import java.io.FileOutputStream;
-import java.io.FileInputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.lang.Thread;
+
 
 
 
@@ -55,10 +47,6 @@ public class MainActivity extends Activity implements SensorEventListener {
      */
     private WifiManager wifiManager;
     /**
-     * The wifi info.
-     */
-    private WifiInfo wifiInfo;
-    /**
      * Accelerometer x value
      */
     private float aX = 0;
@@ -74,32 +62,13 @@ public class MainActivity extends Activity implements SensorEventListener {
     /**
      * Text fields to show the sensor values.
      */
-    private TextView currentY, currentZ, titleAcc, textRssi, textWalking;
+    private TextView textRssi;
 
-    /**
-     * timestamp for sensor valies
-     */
-    private long timestamp;
 
-    /**
-     * walking detection based on linear acceleration
-     */
-
-    String fileNameAcc; // acceleration  data filename with current time
 
     String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-    String fileNameWifi = "wifiData_" + curTime + ".csv";
+    Button buttonRssi,buttonRssi1,buttonRssi2,buttonRssi3;
 
-    Button buttonRssi;
-    Button buttonAccRecord;
-
-    private boolean isRecord = false;
-    List accTrainCSV = new ArrayList();
-    int WINDOW_SIZE = 25; // acceleration detection, number of samples
-
-    float sumY = 0;  // for window average counting
-    float sumZ = 0;
-    int sampleCounter;
 
 
     @Override
@@ -108,18 +77,15 @@ public class MainActivity extends Activity implements SensorEventListener {
         setContentView(R.layout.activity_main);
 
         // Create the text views.
-        currentY = (TextView) findViewById(R.id.currentY);
-        currentZ = (TextView) findViewById(R.id.currentZ);
-        titleAcc = (TextView) findViewById(R.id.titleAcc);
         textRssi = (TextView) findViewById(R.id.textRSSI);
-        textWalking = (TextView) findViewById(R.id.walkText);
+
 
 
         // Create the button
         buttonRssi = (Button) findViewById(R.id.buttonRSSI);
-
-        // Create acceleration button recorder
-        buttonAccRecord = (Button) findViewById(R.id.buttonAccRecord);
+        buttonRssi1 = (Button) findViewById(R.id.buttonRSSI1);
+        buttonRssi2 = (Button) findViewById(R.id.buttonRSSI2);
+        buttonRssi3 = (Button) findViewById(R.id.buttonRSSI3);
 
         // Set the sensor manager
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -132,7 +98,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             // register 'this' as a listener that updates values. Each time a sensor value changes,
             // the method 'onSensorChanged()' is called.
             sensorManager.registerListener(this, accelerometer,
-                    SensorManager.SENSOR_DELAY_GAME);
+                    SensorManager.SENSOR_DELAY_NORMAL);
 
         } else {
             // No accelerometer!
@@ -147,111 +113,28 @@ public class MainActivity extends Activity implements SensorEventListener {
         buttonRssi.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Set text.
-                textRssi.setText("\n\tScan all access points:");
-                // Set wifi manager.
-                wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                // Start a wifi scan
-                Map<String, ArrayList<Integer>> wifiData = new HashMap<>();
-                for (int i=0; i<10; i++) {
-                    wifiManager.startScan();
-                    // Store results in a list.
-                    List<ScanResult> scanResults = wifiManager.getScanResults();
-                    for (ScanResult scanResult : scanResults) {
-                        textRssi.setText(textRssi.getText() + "\n\tBSSID = "
-                                + scanResult.BSSID + "    RSSI = "
-                                + scanResult.level + "dBm");
-                        if (wifiData.containsKey(scanResult.BSSID)) {
-                            //key exists
-                            wifiData.get(scanResult.BSSID).add(scanResult.level);
-                        } else {
-                            //key does not exists
-                            ArrayList<Integer> wifiDataList = new ArrayList<>();
-                            wifiDataList.add(scanResult.level);
-                            wifiData.put(scanResult.BSSID, wifiDataList);
-                        }
-                    }
-                }
-                for (Map.Entry<String, ArrayList<Integer>> entry : wifiData.entrySet()) {
-                    String row  = entry.getKey() + ",";
-                    Iterator<Integer> iterator = entry.getValue().iterator();
-                    while (iterator.hasNext()) {
-                        row += iterator.next() + ",";
-                    }
-                    row  = row.substring(0,row.length()-1)+ "\n";
-                    writeWifiValuesCSV(row);
-                }
-
-//                for (ScanResult scanResult : scanResults) {
-//                    textRssi.setText(textRssi.getText() + "\n\tBSSID = "
-//                            + scanResult.BSSID + "    RSSI = "
-//                            + scanResult.level + "dBm");
-//                String row = scanResult.BSSID+" , " + scanResult.level + " , " + String.valueOf(scanResult.timestamp) + "\n";
-//                writeWifiValuesCSV(row);
-//                }
+                getWifiData(1);
             }
         });
-
-        // Create a click listener for acc recorder button.
-        buttonAccRecord.setOnClickListener(new OnClickListener() {
+        buttonRssi1.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (!isRecord) {
-                    isRecord = true;
-                    buttonAccRecord.setText("STOP RECORD");
-                    currentY.setTextColor(Color.RED);
-                    currentZ.setTextColor(Color.RED);
-
-                } else {
-                    isRecord = false;
-                    currentY.setTextColor(Color.BLACK);
-                    currentZ.setTextColor(Color.BLACK);
-
-                    buttonAccRecord.setText("START RECORD");
-                    String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()); // time at first call
-                    fileNameAcc = "accData_" + curTime + ".csv";
-
-                    String row ="Acceleration Y, Accelearion Z, timestamp\n";   // write header to csv file
-
-                    try {
-                        File sdCard = Environment.getExternalStorageDirectory();
-                        File dir = new File(sdCard.getAbsolutePath() + "/localization");
-                        dir.mkdir();
-
-                        File file = new File(dir, fileNameAcc);
-                        FileOutputStream f = new FileOutputStream(file,true);
-                        f.write(row.getBytes());
-                        f.flush();
-                        f.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+                getWifiData(2);
+            }
+        });
+        buttonRssi2.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getWifiData(3);
+            }
+        });
+        buttonRssi3.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getWifiData(4);
             }
         });
 
-        String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()); // time at first call
-        fileNameAcc = "accData_" + curTime + ".csv";
-
-
-        String row ="Acceleration Y, Accelearion Z, timestamp\n";   // write header to csv file
-
-        try {
-            File sdCard = Environment.getExternalStorageDirectory();
-            File dir = new File(sdCard.getAbsolutePath() + "/localization");
-            dir.mkdir();
-
-            File file = new File(dir, fileNameAcc);
-            FileOutputStream f = new FileOutputStream(file,true);
-            f.write(row.getBytes());
-            f.flush();
-            f.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        accTrainCSV = readAccTrainCSV(); // read trained acceleration data from .csv file
     }
 
     // onResume() registers the accelerometer for listening the events
@@ -275,74 +158,19 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        currentY.setText("0.0");
-        currentZ.setText("0.0");
-
-
-        // get the the y values of the accelerometer
-        aX =event.values[0];
-        aY =event.values[1];
-        aZ =event.values[2];
-
-        timestamp = event.timestamp;
-
-
-        // display the current x,y,z accelerometer values
-        currentY.setText(Float.toString(aY));
-        currentZ.setText(Float.toString(aZ));
-
-
-        if(isRecord)writeAccValuesCSV(aY,aZ,timestamp);
-
-
-        sampleCounter ++;   // count samples in a window
-        sumY += Math.abs(aY);         // we collect sum to get average, then use it for KNN
-        sumZ += Math.abs(aZ);
-
-        if (sampleCounter == WINDOW_SIZE) {
-            accelerationKNN(sumY / WINDOW_SIZE, sumZ / WINDOW_SIZE);    // send the averages to KNN
-            sampleCounter = 0;
-            sumY = 0;
-            sumZ= 0;
-        }
     }
 
 
-    public void writeAccValuesCSV(double aY, double aZ,long timestamp) {
+    public void writeWifiValuesCSV(String row, int cell) {
 
         try {
 
             File sdCard = Environment.getExternalStorageDirectory();
             File dir = new File(sdCard.getAbsolutePath() + "/localization");
             dir.mkdir();
+            String fileNameWifi1 = "wifiData_cell" + cell + "_" + curTime + ".csv";
 
-            File file = new File(dir, fileNameAcc);
-            FileOutputStream f = new FileOutputStream(file,true);
-
-            String row = String.valueOf(aY)+" , "+ String.valueOf(aZ)+" , "+timestamp+"\n";
-
-            try {
-                f.write(row.getBytes());
-                f.flush();
-                f.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void writeWifiValuesCSV(String row) {
-
-        try {
-
-            File sdCard = Environment.getExternalStorageDirectory();
-            File dir = new File(sdCard.getAbsolutePath() + "/localization");
-            dir.mkdir();
-
-            File file = new File(dir, fileNameWifi);
+            File file = new File(dir, fileNameWifi1);
             FileOutputStream f = new FileOutputStream(file,true);
 
 
@@ -360,101 +188,48 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     }
 
-    public void accelerationKNN(float avgY,float avgZ) {
+    public void getWifiData(int cell){
 
-        short KValue = 5; // K for KNN
-
-        ArrayList KNNList = new ArrayList(KValue);
-        ArrayList clusters = new ArrayList(KValue);
-
-        for (int i = 0; i < accTrainCSV.size(); i++) {   //iterate through the training values
-
-            String[] line = (String[]) accTrainCSV.get(i);
-
-            float aYTrain = Float.parseFloat(line[0]);
-            float aZTrain = Float.parseFloat(line[1]);
-            int walking = Integer.parseInt(line[2]);
-
-            float distance = eucledianDistance(avgY, avgZ, aYTrain, aZTrain);
-
-            if (i < KValue) {
-                KNNList.add(i, distance);
-                clusters.add(i, walking);
-            } else {
-
-                float min = (float) Collections.min(KNNList);
-
-                float a = min;
-
-                if (distance < (float) Collections.min(KNNList)) {
-                    KNNList.set(KNNList.indexOf(Collections.max(KNNList)), distance);
-                    clusters.set(KNNList.indexOf(Collections.max(KNNList)), walking);
+        int numWifiCollect = 5;
+        // Set text.
+        textRssi.setText("Scan all access points:");
+        // Set wifi manager.
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        // Start a wifi scan
+        Map<String, ArrayList<Integer>> wifiData = new HashMap<>();
+        textRssi.setText("start getting data in Cell " + cell + "...");
+        for (int i=0; i<numWifiCollect; i++) {
+            textRssi.setText(i+"s...");
+            wifiManager.startScan();
+            // Store results in a list.
+            List<ScanResult> scanResults = wifiManager.getScanResults();
+            for (ScanResult scanResult : scanResults) {
+                String key = scanResult.SSID + ","+scanResult.BSSID;
+                if (wifiData.containsKey(key)) {
+                    //key exists
+                    wifiData.get(key).add(scanResult.level);
+                } else {
+                    //key does not exists
+                    ArrayList<Integer> wifiDataList = new ArrayList<>();
+                    wifiDataList.add(scanResult.level);
+                    wifiData.put(key, wifiDataList);
                 }
             }
-        }
-
-        if (Collections.frequency(clusters, 0) > 2) {
-            textWalking.setText("Standing");
-        } else {
-            textWalking.setText("Walking");
-        }
-    }
-
-
-    float eucledianDistance (float aY, float aZ, float listAY, float listAZ){
-
-        return (float)Math.sqrt((listAY-aY)*(listAY-aY)+(listAZ-aZ)*(listAZ-aZ));
-    }
-
-    public List readAccTrainCSV(){
-
-        List accTrainData = new ArrayList();
-
-        if (isExternalStorageWritable()){
-
-            String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/traindata.csv";
-
-            try{
-                FileInputStream csvInput = new FileInputStream(path);
-                accTrainData =  csvread(csvInput);
-            } catch (Exception e) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
-
-        return accTrainData;
-    }
-
-    /* Checks if external storage is available for read and write */
-    public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
-    }
-
-    public List csvread(InputStream inputStream){
-        List resultList = new ArrayList();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-        try {
-            String csvLine;
-            while ((csvLine = reader.readLine()) != null) {
-                String[] row = csvLine.split(",");
-                resultList.add(row);
+        for (Map.Entry<String, ArrayList<Integer>> entry : wifiData.entrySet()) {
+            String row  = entry.getKey() + ",";
+            Iterator<Integer> iterator = entry.getValue().iterator();
+            while (iterator.hasNext()) {
+                row += iterator.next() + ",";
             }
+            row  = row.substring(0,row.length()-1)+ "\n";
+            writeWifiValuesCSV(row,cell);
         }
-        catch (IOException ex) {
-            throw new RuntimeException("Error in reading CSV file: "+ex);
-        }
-        finally {
-            try {
-                inputStream.close();
-            }
-            catch (IOException e) {
-                throw new RuntimeException("Error while closing input stream: "+e);
-            }
-        }
-        return resultList;
+        textRssi.setText("Done in Cell " + cell);
     }
 }
