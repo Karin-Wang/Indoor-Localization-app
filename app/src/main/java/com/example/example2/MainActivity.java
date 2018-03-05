@@ -33,7 +33,6 @@ import java.lang.Thread;
  * Smart Phone Sensing Example 2. Working with sensors.
  */
 public class MainActivity extends Activity implements SensorEventListener {
-    private int anfawen;
     /**
      * The sensor manager object.
      */
