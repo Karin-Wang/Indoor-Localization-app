@@ -12,6 +12,8 @@ import android.hardware.SensorManager;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.os.Environment;
 import java.io.FileOutputStream;
@@ -45,28 +47,23 @@ public class MainActivity extends Activity implements SensorEventListener {
      * The wifi manager.
      */
     private WifiManager wifiManager;
-    /**
-     * Accelerometer x value
-     */
-    private float aX = 0;
-    /**
-     * Accelerometer y value
-     */
-    private float aY = 0;
-    /**
-     * Accelerometer z value
-     */
-    private float aZ = 0;
 
     /**
      * Text fields to show the sensor values.
      */
     private TextView textRssi;
 
+    Button buttonStart;
+    RadioButton radioButton1,radioButton2,radioButton3,radioButton4,radioButton5,
+            radioButton6,radioButton7,radioButton8,radioButton9,radioButton10,radioButton11,
+            radioButton12,radioButton13,radioButton14,radioButton15,radioButton16,
+            radioButton17,radioButton18;
+
+    RadioButton radioButtonN,radioButtonE,radioButtonS,radioButtonW;
 
 
     String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-    Button buttonRssi,buttonRssi1,buttonRssi2,buttonRssi3;
+
 
 
 
@@ -80,11 +77,36 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 
 
-        // Create the button
-        buttonRssi = (Button) findViewById(R.id.buttonRSSI);
-        buttonRssi1 = (Button) findViewById(R.id.buttonRSSI1);
-        buttonRssi2 = (Button) findViewById(R.id.buttonRSSI2);
-        buttonRssi3 = (Button) findViewById(R.id.buttonRSSI3);
+        // Create the buttons and RadioButtons
+        buttonStart = (Button) findViewById(R.id.buttonStart);
+
+        radioButton1 = (RadioButton) findViewById(R.id.radioButton1);
+        radioButton2 = (RadioButton) findViewById(R.id.radioButton2);
+        radioButton3 = (RadioButton) findViewById(R.id.radioButton3);
+        radioButton4 = (RadioButton) findViewById(R.id.radioButton4);
+        radioButton5 = (RadioButton) findViewById(R.id.radioButton5);
+        radioButton6 = (RadioButton) findViewById(R.id.radioButton6);
+        radioButton7 = (RadioButton) findViewById(R.id.radioButton7);
+        radioButton8 = (RadioButton) findViewById(R.id.radioButton8);
+        radioButton9 = (RadioButton) findViewById(R.id.radioButton9);
+        radioButton10 = (RadioButton) findViewById(R.id.radioButton10);
+        radioButton11 = (RadioButton) findViewById(R.id.radioButton11);
+        radioButton12 = (RadioButton) findViewById(R.id.radioButton12);
+        radioButton13 = (RadioButton) findViewById(R.id.radioButton13);
+        radioButton14 = (RadioButton) findViewById(R.id.radioButton14);
+        radioButton15 = (RadioButton) findViewById(R.id.radioButton15);
+        radioButton16 = (RadioButton) findViewById(R.id.radioButton16);
+        radioButton17 = (RadioButton) findViewById(R.id.radioButton17);
+        radioButton18 = (RadioButton) findViewById(R.id.radioButton18);
+
+        radioButtonN = (RadioButton) findViewById(R.id.radioButtonN);
+        radioButtonE = (RadioButton) findViewById(R.id.radioButtonE);
+        radioButtonS = (RadioButton) findViewById(R.id.radioButtonS);
+        radioButtonW = (RadioButton) findViewById(R.id.radioButtonW);
+
+        RadioGroup zones = (RadioGroup) findViewById(R.id.zones);
+        RadioGroup directions = (RadioGroup) findViewById(R.id.directions);
+
 
         // Set the sensor manager
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -108,31 +130,17 @@ public class MainActivity extends Activity implements SensorEventListener {
         // Set the wifi manager
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
-        // Create a click listener for our button.
-        buttonRssi.setOnClickListener(new OnClickListener() {
+
+        // Create a click listener for start button.
+        buttonStart.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 getWifiData(1);
             }
         });
-        buttonRssi1.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getWifiData(2);
-            }
-        });
-        buttonRssi2.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getWifiData(3);
-            }
-        });
-        buttonRssi3.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getWifiData(4);
-            }
-        });
+
+        // Create a check listener for radio buttons
+
 
     }
 
