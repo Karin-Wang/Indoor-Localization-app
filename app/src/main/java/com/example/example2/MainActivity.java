@@ -51,7 +51,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     /**
      * Text fields to show the sensor values.
      */
-    private TextView textRssi;
+    private TextView titleRssi,textRssi;
 
     Button buttonStart;
     RadioButton radioButton1,radioButton2,radioButton3,radioButton4,radioButton5,
@@ -60,6 +60,9 @@ public class MainActivity extends Activity implements SensorEventListener {
             radioButton17,radioButton18;
 
     RadioButton radioButtonN,radioButtonE,radioButtonS,radioButtonW;
+
+    private boolean isChecking = true;
+    private int mCheckedId = R.id.radioButton1;
 
 
     String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -73,6 +76,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         setContentView(R.layout.activity_main);
 
         // Create the text views.
+        titleRssi = (TextView) findViewById(R.id.titleRSSI);
         textRssi = (TextView) findViewById(R.id.textRSSI);
 
 
@@ -104,7 +108,13 @@ public class MainActivity extends Activity implements SensorEventListener {
         radioButtonS = (RadioButton) findViewById(R.id.radioButtonS);
         radioButtonW = (RadioButton) findViewById(R.id.radioButtonW);
 
-        RadioGroup zones = (RadioGroup) findViewById(R.id.zones);
+        RadioGroup zones1 = (RadioGroup) findViewById(R.id.zones1);
+        RadioGroup zones2 = (RadioGroup) findViewById(R.id.zones2);
+        RadioGroup zones3 = (RadioGroup) findViewById(R.id.zones3);
+        RadioGroup zones4 = (RadioGroup) findViewById(R.id.zones4);
+        RadioGroup zones5 = (RadioGroup) findViewById(R.id.zones5);
+        RadioGroup zones6 = (RadioGroup) findViewById(R.id.zones6);
+
         RadioGroup directions = (RadioGroup) findViewById(R.id.directions);
 
 
@@ -124,7 +134,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         } else {
             // No accelerometer!
         }
-
 
 
         // Set the wifi manager
