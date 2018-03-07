@@ -1,6 +1,7 @@
 package com.example.example2;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -53,7 +54,7 @@ public class MainActivity extends Activity implements SensorEventListener {
      */
     private TextView titleRssi,textRssi;
 
-    Button buttonStart;
+    Button buttonStart,buttonClear;
     RadioButton radioButton1,radioButton2,radioButton3,radioButton4,radioButton5,
             radioButton6,radioButton7,radioButton8,radioButton9,radioButton10,radioButton11,
             radioButton12,radioButton13,radioButton14,radioButton15,radioButton16,
@@ -61,11 +62,11 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     RadioButton radioButtonN,radioButtonE,radioButtonS,radioButtonW;
 
-    private boolean isChecking = true;
-    private int mCheckedId = R.id.radioButton1;
-
 
     String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+
+    int zoneID;
+    int directionID;
 
 
 
@@ -83,6 +84,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         // Create the buttons and RadioButtons
         buttonStart = (Button) findViewById(R.id.buttonStart);
+        buttonClear = (Button) findViewById(R.id.buttonClear);
 
         radioButton1 = (RadioButton) findViewById(R.id.radioButton1);
         radioButton2 = (RadioButton) findViewById(R.id.radioButton2);
@@ -108,14 +110,57 @@ public class MainActivity extends Activity implements SensorEventListener {
         radioButtonS = (RadioButton) findViewById(R.id.radioButtonS);
         radioButtonW = (RadioButton) findViewById(R.id.radioButtonW);
 
-        RadioGroup zones1 = (RadioGroup) findViewById(R.id.zones1);
-        RadioGroup zones2 = (RadioGroup) findViewById(R.id.zones2);
-        RadioGroup zones3 = (RadioGroup) findViewById(R.id.zones3);
-        RadioGroup zones4 = (RadioGroup) findViewById(R.id.zones4);
-        RadioGroup zones5 = (RadioGroup) findViewById(R.id.zones5);
-        RadioGroup zones6 = (RadioGroup) findViewById(R.id.zones6);
+        final RadioGroup zones1 = (RadioGroup) findViewById(R.id.zones1);
+        final RadioGroup zones2 = (RadioGroup) findViewById(R.id.zones2);
+        final RadioGroup zones3 = (RadioGroup) findViewById(R.id.zones3);
+        final RadioGroup zones4 = (RadioGroup) findViewById(R.id.zones4);
+        final RadioGroup zones5 = (RadioGroup) findViewById(R.id.zones5);
+        final RadioGroup zones6 = (RadioGroup) findViewById(R.id.zones6);
 
-        RadioGroup directions = (RadioGroup) findViewById(R.id.directions);
+
+        final RadioGroup directions = (RadioGroup) findViewById(R.id.directions);
+
+
+        // Create a click listener for start button.
+        buttonStart.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (zones1.getCheckedRadioButtonId()!= -1) zoneID = zones1.getCheckedRadioButtonId();
+                if (zones2.getCheckedRadioButtonId()!= -1) zoneID = zones2.getCheckedRadioButtonId();
+                if (zones3.getCheckedRadioButtonId()!= -1) zoneID = zones3.getCheckedRadioButtonId();
+                if (zones4.getCheckedRadioButtonId()!= -1) zoneID = zones4.getCheckedRadioButtonId();
+                if (zones5.getCheckedRadioButtonId()!= -1) zoneID = zones5.getCheckedRadioButtonId();
+                if (zones6.getCheckedRadioButtonId()!= -1) zoneID = zones6.getCheckedRadioButtonId();
+
+                directionID = directions.getCheckedRadioButtonId();
+
+                RadioButton checkedRadioButton = (RadioButton) findViewById(zoneID);
+                int textZone = Integer.parseInt(checkedRadioButton.getText().toString().substring(5));
+
+                RadioButton checkedRadioButton2 = (RadioButton) findViewById(directionID);
+                String textDirection = checkedRadioButton2.getText().toString();
+
+                textRssi.setTextColor(Color.RED);
+                textRssi.setText("Recording, Selected zone: "+textZone+" Selected direction: "+textDirection);
+
+                getWifiData(textZone,textDirection);
+            }
+        });
+
+        // Create a click listener for clear button.
+        buttonClear.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                zones1.clearCheck();
+                zones2.clearCheck();
+                zones3.clearCheck();
+                zones4.clearCheck();
+                zones5.clearCheck();
+                zones6.clearCheck();
+                directions.clearCheck();
+            }
+        });
 
 
         // Set the sensor manager
@@ -138,18 +183,6 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         // Set the wifi manager
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-
-
-        // Create a click listener for start button.
-        buttonStart.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getWifiData(1);
-            }
-        });
-
-        // Create a check listener for radio buttons
-
 
     }
 
@@ -177,14 +210,14 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
 
-    public void writeWifiValuesCSV(String row, int cell) {
+    public void writeWifiValuesCSV(String row, int cell, String direction) {
 
         try {
 
             File sdCard = Environment.getExternalStorageDirectory();
             File dir = new File(sdCard.getAbsolutePath() + "/localization");
             dir.mkdir();
-            String fileNameWifi1 = "wifiData_cell" + cell + "_" + curTime + ".csv";
+            String fileNameWifi1 = "wifiData_cell" + cell + direction + "_" + curTime + ".csv";
 
             File file = new File(dir, fileNameWifi1);
             FileOutputStream f = new FileOutputStream(file,true);
@@ -204,7 +237,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     }
 
-    public void getWifiData(int cell){
+    public void getWifiData(int zone, String direction){
 
         int numWifiCollect = 5;
         // Set text.
@@ -213,7 +246,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         // Start a wifi scan
         Map<String, ArrayList<Integer>> wifiData = new HashMap<>();
-        textRssi.setText("start getting data in Cell " + cell + "...");
+        textRssi.setText("start getting data in zone " + zone + direction + "...");
         for (int i=0; i<numWifiCollect; i++) {
             textRssi.setText(i+"s...");
             wifiManager.startScan();
@@ -244,8 +277,10 @@ public class MainActivity extends Activity implements SensorEventListener {
                 row += iterator.next() + ",";
             }
             row  = row.substring(0,row.length()-1)+ "\n";
-            writeWifiValuesCSV(row,cell);
+            writeWifiValuesCSV(row,zone,direction);
         }
-        textRssi.setText("Done in Cell " + cell);
+        textRssi.setText("Done in Cell " + zone + " Direction "+direction);
+        textRssi.setTextColor(Color.BLACK);
+
     }
 }
