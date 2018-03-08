@@ -239,7 +239,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     public void getWifiData(int zone, String direction){
 
-        int numWifiCollect = 5;
+        int numWifiSamples = 120;
         // Set text.
         textRssi.setText("Scan all access points:");
         // Set wifi manager.
@@ -247,7 +247,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         // Start a wifi scan
         Map<String, ArrayList<Integer>> wifiData = new HashMap<>();
         textRssi.setText("start getting data in zone " + zone + direction + "...");
-        for (int i=0; i<numWifiCollect; i++) {
+        for (int i=0; i<numWifiSamples; i++) {
             textRssi.setText(i+"s...");
             wifiManager.startScan();
             // Store results in a list.
@@ -269,6 +269,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
         }
         for (Map.Entry<String, ArrayList<Integer>> entry : wifiData.entrySet()) {
             String row  = entry.getKey() + ",";
