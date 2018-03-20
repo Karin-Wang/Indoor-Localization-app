@@ -10,6 +10,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -58,7 +59,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     RadioButton radioButton1,radioButton2,radioButton3,radioButton4,radioButton5,
             radioButton6,radioButton7,radioButton8,radioButton9,radioButton10,radioButton11,
             radioButton12,radioButton13,radioButton14,radioButton15,radioButton16,
-            radioButton17,radioButton18;
+            radioButton17,radioButton18,radioButton19;
 
     RadioButton radioButtonN,radioButtonE,radioButtonS,radioButtonW;
 
@@ -67,6 +68,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     int zoneID;
     int directionID;
+    int remaining;
 
 
 
@@ -104,6 +106,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         radioButton16 = (RadioButton) findViewById(R.id.radioButton16);
         radioButton17 = (RadioButton) findViewById(R.id.radioButton17);
         radioButton18 = (RadioButton) findViewById(R.id.radioButton18);
+        radioButton19 = (RadioButton) findViewById(R.id.radioButton19);
 
         radioButtonN = (RadioButton) findViewById(R.id.radioButtonN);
         radioButtonE = (RadioButton) findViewById(R.id.radioButtonE);
@@ -237,51 +240,76 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     }
 
-    public void getWifiData(int zone, String direction){
+    public void getWifiData(final int zone,final String direction){
 
-        int numWifiSamples = 120;
-        // Set text.
-        textRssi.setText("Scan all access points:");
-        // Set wifi manager.
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        // Start a wifi scan
-        Map<String, ArrayList<Integer>> wifiData = new HashMap<>();
-        textRssi.setText("start getting data in zone " + zone + direction + "...");
-        for (int i=0; i<numWifiSamples; i++) {
-            textRssi.setText(i+"s...");
-            wifiManager.startScan();
-            // Store results in a list.
-            List<ScanResult> scanResults = wifiManager.getScanResults();
-            for (ScanResult scanResult : scanResults) {
-                String key = scanResult.SSID + ","+scanResult.BSSID;
-                if (wifiData.containsKey(key)) {
-                    //key exists
-                    wifiData.get(key).add(scanResult.level);
-                } else {
-                    //key does not exists
-                    ArrayList<Integer> wifiDataList = new ArrayList<>();
-                    wifiDataList.add(scanResult.level);
-                    wifiData.put(key, wifiDataList);
+        final Handler handler = new Handler();
+        Runnable runnable = new Runnable() {
+
+            public void run() {
+
+                int numWifiSamples = 10;
+
+                textRssi.setText("Scan all access points:");
+                // Set wifi manager.
+                wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                // Start a wifi scan
+                Map<String, ArrayList<Integer>> wifiData = new HashMap<>();
+                textRssi.setText("start getting data in zone " + zone + direction + "...");
+                for (int i=0; i<numWifiSamples; i++) {
+
+                    remaining = numWifiSamples - i;
+
+                    handler.post(new Runnable(){
+                        public void run() {
+                            textRssi.setText("Getting data in zone " + zone + direction + " , Remaining time: "+remaining+"s...");
+                        }
+                    });
+
+                    wifiManager.startScan();
+                    // Store results in a list.
+                    List<ScanResult> scanResults = wifiManager.getScanResults();
+                    for (ScanResult scanResult : scanResults) {
+                        String key = scanResult.SSID + ","+scanResult.BSSID;
+                        if (wifiData.containsKey(key)) {
+                            //key exists
+                            wifiData.get(key).add(scanResult.level);
+                        } else {
+                            //key does not exists
+                            ArrayList<Integer> wifiDataList = new ArrayList<>();
+                            wifiDataList.add(scanResult.level);
+                            wifiData.put(key, wifiDataList);
+                        }
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                 }
-            }
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                for (Map.Entry<String, ArrayList<Integer>> entry : wifiData.entrySet()) {
+                    String row  = entry.getKey() + ",";
+                    Iterator<Integer> iterator = entry.getValue().iterator();
+                    while (iterator.hasNext()) {
+                        row += iterator.next() + ",";
+                    }
+                    row  = row.substring(0,row.length()-1)+ "\n";
+                    writeWifiValuesCSV(row,zone,direction);
+                }
 
-        }
-        for (Map.Entry<String, ArrayList<Integer>> entry : wifiData.entrySet()) {
-            String row  = entry.getKey() + ",";
-            Iterator<Integer> iterator = entry.getValue().iterator();
-            while (iterator.hasNext()) {
-                row += iterator.next() + ",";
+
+
+                handler.post(new Runnable(){
+                    public void run() {
+                        textRssi.setText("Done in Cell " + zone + " Direction "+direction);
+                        textRssi.setTextColor(Color.BLACK);
+                    }
+                });
             }
-            row  = row.substring(0,row.length()-1)+ "\n";
-            writeWifiValuesCSV(row,zone,direction);
-        }
-        textRssi.setText("Done in Cell " + zone + " Direction "+direction);
-        textRssi.setTextColor(Color.BLACK);
+        };
+        new Thread(runnable).start();
+
+
 
     }
 }
