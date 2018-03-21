@@ -1,4 +1,4 @@
-package com.example.example2;
+package com.example.particlefilter;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
