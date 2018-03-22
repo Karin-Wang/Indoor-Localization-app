@@ -20,6 +20,8 @@
 
 
 
+
+
     ]]>
 
     <LinearLayout
@@ -59,11 +61,18 @@
 
     </LinearLayout>
 
-    <ImageView
-        android:id="@+id/floorplan"
+    <LinearLayout
+        android:id="@+id/canvas"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:adjustViewBounds="true"
-        android:scaleType="fitXY" />
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/floorplan"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:adjustViewBounds="true"
+            android:scaleType="fitXY" />
+    </LinearLayout>
 
 </LinearLayout>

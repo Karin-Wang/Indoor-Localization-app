@@ -29,8 +29,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.lang.Thread;
-
-
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 
 
@@ -77,6 +79,9 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     private double[] accarray = new double[5];
 
+    ImageView floorplan;
+
+
 
 
 
@@ -97,12 +102,10 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         // create image view
 
-        ImageView floorplan;
 
         floorplan=(ImageView)findViewById(R.id.floorplan);
 
         floorplan.setImageResource(R.drawable.floor_plan_v2_3);
-
 
 
 
@@ -176,6 +179,8 @@ public class MainActivity extends Activity implements SensorEventListener {
             public void onClick(View v) {
 
                 String fileNameAcc;
+
+                drawCircles();
 
 
                 if (!isRecord) {
@@ -337,6 +342,29 @@ public class MainActivity extends Activity implements SensorEventListener {
             samplecounter++;
 
         }
+
+    }
+
+    public void drawCircles(){   // stackoverflow code
+
+
+        Bitmap imageBitmap = Bitmap.createBitmap(floorplan.getWidth(), floorplan.getHeight(), Bitmap.Config.ARGB_8888);
+
+        imageBitmap = imageBitmap.copy(imageBitmap.getConfig(), true);
+
+        Canvas canvas = new Canvas(imageBitmap);
+
+        Paint p = new Paint();
+        p.setColor(Color.RED);
+
+
+        floorplan.setBackgroundResource(R.drawable.floor_plan_v2_3);
+
+        canvas.drawCircle(floorplan. getWidth()/2,floorplan.getHeight()/2, 20, p);
+        floorplan.setImageBitmap(imageBitmap);
+
+        //floorplan.invalidate();
+
 
     }
 
