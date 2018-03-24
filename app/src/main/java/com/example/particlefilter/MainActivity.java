@@ -11,6 +11,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
+import android.util.AttributeSet;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -24,7 +25,6 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +32,7 @@ import java.lang.Thread;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.graphics.Point;
 
 
 
@@ -77,6 +77,17 @@ public class MainActivity extends Activity implements SensorEventListener {
     private int samplecounter = 0;
     private double sum = 0;
 
+    boolean iswalking = false;
+    boolean init = true; // check if initialization has happened
+    int prevx;
+    int prevy;
+    int deltax;
+    int deltay;
+
+    Bitmap imageBitmap;
+    Canvas canvas;
+    Paint p;
+
     private double[] accarray = new double[5];
 
     ImageView floorplan;
@@ -106,7 +117,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         floorplan=(ImageView)findViewById(R.id.floorplan);
 
         floorplan.setImageResource(R.drawable.floor_plan_v2_3);
-
 
 
         // Set the sensor manager
@@ -180,8 +190,6 @@ public class MainActivity extends Activity implements SensorEventListener {
 
                 String fileNameAcc;
 
-                drawCircles();
-
 
                 if (!isRecord) {
                     isRecord = true;
@@ -213,7 +221,6 @@ public class MainActivity extends Activity implements SensorEventListener {
                 }
             }
         });
-
     }
 
     // onResume() registers the accelerometer for listening the events
@@ -230,6 +237,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         super.onPause();
         sensorManager.unregisterListener(this);
     }
+
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -248,15 +256,15 @@ public class MainActivity extends Activity implements SensorEventListener {
         else if (event.sensor == magnetometer) {
             System.arraycopy(event.values, 0, mMagnetometerReading,
                     0, mMagnetometerReading.length);
-            updateOrientationAngles();
+            double azimuth = updateOrientationAngles();
+            initCanvas();
+            //if(iswalking) updateCircle(azimuth);
+
+            // TODO some kind of latch, that only calls update orientation when both sensors are updated
+
         }
 
-       /* else if (event.sensor == stepcounter) {
 
-            stepcount++;
-            textstep.setText("Step Counter : "+stepcount);
-
-        }*/
 
         else if (event.sensor == linearaccelerometer) {
 
@@ -297,7 +305,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
 
-    public void updateOrientationAngles() {
+    public double updateOrientationAngles() {
         // Update rotation matrix, which is needed to update orientation angles.
         SensorManager.getRotationMatrix(mRotationMatrix, null,
                 mAccelerometerReading, mMagnetometerReading);
@@ -305,6 +313,8 @@ public class MainActivity extends Activity implements SensorEventListener {
         SensorManager.getOrientation(mRotationMatrix, mOrientationAngles);
 
         textaz.setText("Azimuth: "+mOrientationAngles[0]/3.1415*180);
+
+        return mOrientationAngles[0]/3.1415*180;
 
     }
 
@@ -318,7 +328,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         double STEP_LIMIT = 0.08;
 
 
-
         if(samplecounter == windowsize-1) {
             // do  standard deviation
             mean = sum/windowsize;
@@ -328,8 +337,12 @@ public class MainActivity extends Activity implements SensorEventListener {
 
             if (deviation > WALK_LIMIT) {
                 textstep.setText("Walking");
+                iswalking = true;
             }
-            if (deviation < STEP_LIMIT) textstep.setText("Standing");
+            if (deviation < STEP_LIMIT) {
+                textstep.setText("Standing");
+                iswalking = false;
+            }
 
             sum = 0;
             samplecounter = 0;
@@ -345,27 +358,34 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     }
 
-    public void drawCircles(){   // stackoverflow code
+
+    public void initCanvas(){   // stackoverflow code
+
+        if(init) {
+
+            init = false;
+
+            imageBitmap = Bitmap.createBitmap(floorplan.getWidth(), floorplan.getHeight(), Bitmap.Config.ARGB_8888);
+
+            imageBitmap = imageBitmap.copy(imageBitmap.getConfig(), true);
+
+            canvas = new Canvas(imageBitmap);
+
+            Paint p = new Paint();
+            p.setColor(Color.RED);
 
 
-        Bitmap imageBitmap = Bitmap.createBitmap(floorplan.getWidth(), floorplan.getHeight(), Bitmap.Config.ARGB_8888);
-
-        imageBitmap = imageBitmap.copy(imageBitmap.getConfig(), true);
-
-        Canvas canvas = new Canvas(imageBitmap);
-
-        Paint p = new Paint();
-        p.setColor(Color.RED);
+            floorplan.setBackgroundResource(R.drawable.floor_plan_v2_3);
 
 
-        floorplan.setBackgroundResource(R.drawable.floor_plan_v2_3);
+            canvas.drawCircle(floorplan.getWidth()/2, floorplan.getHeight() / 2, 10, p);
 
-        canvas.drawCircle(floorplan. getWidth()/2,floorplan.getHeight()/2, 20, p);
-        floorplan.setImageBitmap(imageBitmap);
+            MyView myview = new MyView(getApplicationContext());
 
-        //floorplan.invalidate();
+            myview.onDraw(canvas);
 
-
+            floorplan.setImageBitmap(imageBitmap);
+        }
     }
-
 }
+
