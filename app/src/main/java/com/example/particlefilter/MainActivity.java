@@ -384,16 +384,12 @@ public class MainActivity extends Activity implements SensorEventListener {
             Paint p = new Paint();
             p.setColor(Color.RED);
 
-
             floorplan.setBackgroundResource(R.drawable.floor_plan_v2_3);
 
             myview = new MyView(getApplicationContext());
 
-
-
             myview.onDraw(canvas);
 
-            canvas.drawCircle(floorplan.getWidth()/2, floorplan.getHeight() / 2, 10, p);
 
             floorplan.setImageBitmap(imageBitmap);
         }
