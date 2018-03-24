@@ -79,18 +79,14 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     boolean iswalking = false;
     boolean init = true; // check if initialization has happened
-    int prevx;
-    int prevy;
-    int deltax;
-    int deltay;
 
     Bitmap imageBitmap;
     Canvas canvas;
-    Paint p;
 
     private double[] accarray = new double[5];
 
     ImageView floorplan;
+    MyView myview;
 
 
 
@@ -258,7 +254,10 @@ public class MainActivity extends Activity implements SensorEventListener {
                     0, mMagnetometerReading.length);
             double azimuth = updateOrientationAngles();
             initCanvas();
-            //if(iswalking) updateCircle(azimuth);
+            if(iswalking) {
+                myview.updatePoints(azimuth,canvas);
+                floorplan.setImageBitmap(imageBitmap);
+            }
 
             // TODO some kind of latch, that only calls update orientation when both sensors are updated
 
@@ -307,10 +306,21 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     public double updateOrientationAngles() {
         // Update rotation matrix, which is needed to update orientation angles.
-        SensorManager.getRotationMatrix(mRotationMatrix, null,
-                mAccelerometerReading, mMagnetometerReading);
 
-        SensorManager.getOrientation(mRotationMatrix, mOrientationAngles);
+        final Handler handler = new Handler();
+        Runnable runnable = new Runnable() {
+
+            public void run() {
+
+                SensorManager.getRotationMatrix(mRotationMatrix, null,
+                        mAccelerometerReading, mMagnetometerReading);
+
+                SensorManager.getOrientation(mRotationMatrix, mOrientationAngles);
+
+            }
+        };
+        new Thread(runnable).start();
+
 
         textaz.setText("Azimuth: "+mOrientationAngles[0]/3.1415*180);
 
@@ -377,12 +387,13 @@ public class MainActivity extends Activity implements SensorEventListener {
 
             floorplan.setBackgroundResource(R.drawable.floor_plan_v2_3);
 
+            myview = new MyView(getApplicationContext());
 
-            canvas.drawCircle(floorplan.getWidth()/2, floorplan.getHeight() / 2, 10, p);
 
-            MyView myview = new MyView(getApplicationContext());
 
             myview.onDraw(canvas);
+
+            canvas.drawCircle(floorplan.getWidth()/2, floorplan.getHeight() / 2, 10, p);
 
             floorplan.setImageBitmap(imageBitmap);
         }

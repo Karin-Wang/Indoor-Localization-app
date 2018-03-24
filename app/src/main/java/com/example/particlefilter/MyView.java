@@ -19,7 +19,10 @@ public class MyView extends View {   // stackoverflow code
 
     Paint paint;
     ArrayList<Point> points = new ArrayList<>();
-    //private int pointsPos = 0; //Which point we will be drawing
+    Iterator<Point> iterator;
+
+
+
     public float x;
     public float y;
     public int radius = 10;
@@ -60,11 +63,8 @@ public class MyView extends View {   // stackoverflow code
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        //ArrayList<Point> points = new ArrayList<>();
-        //List<x> myList = new ArrayList<x>();
-        //public ArrayList<x> GetList()
 
-        Iterator<Point>iterator = points.iterator();
+        iterator = points.iterator();
 
         while (iterator.hasNext()) {
 
@@ -78,8 +78,42 @@ public class MyView extends View {   // stackoverflow code
 
     public void populateArrayList(){
         points.clear();
-        points.add(new Point(10, 10));
-        points.add(new Point(220, 40));
+        points.add(new Point(400, 500));
+        points.add(new Point(500, 400));
+        points.add(new Point(300, 600));
+        points.add(new Point(600, 300));
+    }
+
+    public void updatePoints(double azimuth,Canvas canvas){
+
+        final double angle = azimuth;
+
+        Runnable runnable = new Runnable() {
+
+            public void run() {
+
+                iterator = points.iterator();
+
+                while (iterator.hasNext()) {
+
+                    Point curPoint = iterator.next();
+
+
+                    curPoint.x += (float) (Math.cos(angle) * 5);
+                    curPoint.y += (float) (Math.sin(angle) * 5);
+
+                }
+            }
+        };
+        new Thread(runnable).start();
+
+        this.onDraw(canvas);
+
+    }
+
+    public void deletePoints(){
+
+
     }
 
 }
