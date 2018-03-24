@@ -2,6 +2,7 @@ package com.example.particlefilter;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -82,6 +83,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     Bitmap imageBitmap;
     Canvas canvas;
+    Button buttonReset;
 
     private double[] accarray = new double[5];
 
@@ -102,8 +104,10 @@ public class MainActivity extends Activity implements SensorEventListener {
         textaz = (TextView) findViewById(R.id.textROTAZ);
 
         // create buttons
-        buttonAccRecord = (Button) findViewById(R.id.recordAcc);
+        //buttonAccRecord = (Button) findViewById(R.id.recordAcc);
         fileNameAcc = "accData_" + curTime + ".csv";
+
+        buttonReset = (Button) findViewById(R.id.reset);
 
 
 
@@ -180,7 +184,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
         // Create a click listener for acc recorder button.
-        buttonAccRecord.setOnClickListener(new OnClickListener() {
+        /*buttonAccRecord.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -216,7 +220,15 @@ public class MainActivity extends Activity implements SensorEventListener {
                     }
                 }
             }
+        });*/
+
+        buttonReset.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                resetInitialBelief();
+            }
         });
+
     }
 
     // onResume() registers the accelerometer for listening the events
@@ -322,9 +334,9 @@ public class MainActivity extends Activity implements SensorEventListener {
         new Thread(runnable).start();
 
 
-        textaz.setText("Azimuth: "+mOrientationAngles[0]/3.1415*180);
+        textaz.setText("Azimuth: "+mOrientationAngles[0]);
 
-        return mOrientationAngles[0]/3.1415*180;
+        return mOrientationAngles[0];
 
     }
 
@@ -384,15 +396,28 @@ public class MainActivity extends Activity implements SensorEventListener {
             Paint p = new Paint();
             p.setColor(Color.RED);
 
+
             floorplan.setBackgroundResource(R.drawable.floor_plan_v2_3);
 
             myview = new MyView(getApplicationContext());
+
 
             myview.onDraw(canvas);
 
 
             floorplan.setImageBitmap(imageBitmap);
         }
+    }
+
+    public void resetInitialBelief() {
+
+        canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        myview.populateArrayList();
+
+        myview.onDraw(canvas);
+
+        floorplan.setImageBitmap(imageBitmap);
+
     }
 }
 

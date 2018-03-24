@@ -66,6 +66,7 @@ public class MyView extends View {   // stackoverflow code
 
         iterator = points.iterator();
 
+    
         while (iterator.hasNext()) {
 
             Point curPoint = iterator.next();
@@ -78,10 +79,9 @@ public class MyView extends View {   // stackoverflow code
 
     public void populateArrayList(){
         points.clear();
-        points.add(new Point(400, 500));
-        points.add(new Point(500, 400));
-        points.add(new Point(300, 600));
-        points.add(new Point(600, 300));
+        points.add(new Point(1000, 400));
+        points.add(new Point(200, 400));
+        points.add(new Point(1600, 400));
     }
 
     public void updatePoints(double azimuth,Canvas canvas){
