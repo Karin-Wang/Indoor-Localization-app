@@ -33,7 +33,7 @@ import java.lang.Thread;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Bitmap;
-import android.graphics.Point;
+import java.util.Timer;
 
 
 
@@ -73,6 +73,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     private final float[] mRotationMatrix = new float[9];
     private final float[] mOrientationAngles = new float[3];
+    public double azimuth;
 
 
     private int samplecounter = 0;
@@ -219,7 +220,6 @@ public class MainActivity extends Activity implements SensorEventListener {
                 resetInitialBelief();
             }
         });
-
     }
 
     // onResume() registers the accelerometer for listening the events
@@ -252,12 +252,8 @@ public class MainActivity extends Activity implements SensorEventListener {
             System.arraycopy(event.values, 0, mAccelerometerReading,
                     0, mAccelerometerReading.length);
 
-            double azimuth = updateOrientationAngles(); // when new acc data arrives, update angles
+            azimuth = updateOrientationAngles(); // when new acc data arrives, update angles
 
-            if(iswalking) {
-                myview.updatePoints(azimuth,canvas);
-                floorplan.setImageBitmap(imageBitmap);
-            }
         }
         else if (event.sensor == magnetometer) {
             System.arraycopy(event.values, 0, mMagnetometerReading,
@@ -387,11 +383,24 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         myview = new MyView(getApplicationContext());
 
-
         myview.onDraw(canvas);
 
-
         floorplan.setImageBitmap(imageBitmap);
+
+
+        final Handler myHandler = new Handler();  // set a handler for updating the points in every "delaymilis" time period
+        myHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if(iswalking) {
+                    myview.updatePoints(azimuth, canvas);
+                    floorplan.setImageBitmap(imageBitmap);
+                }
+                myHandler.postDelayed(this,200);
+            }
+        }, 0);  //the time is in miliseconds
+
+
     }
 
 
