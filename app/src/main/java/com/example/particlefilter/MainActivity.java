@@ -110,15 +110,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         buttonReset = (Button) findViewById(R.id.reset);
 
 
-
-        // create image view
-
-
-        floorplan=(ImageView)findViewById(R.id.floorplan);
-
-        floorplan.setImageResource(R.drawable.floor_plan_v2_3);
-
-
         // Set the sensor manager
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
@@ -228,7 +219,6 @@ public class MainActivity extends Activity implements SensorEventListener {
                 resetInitialBelief();
             }
         });
-
     }
 
     // onResume() registers the accelerometer for listening the events
@@ -255,31 +245,31 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
 
+
+        if(init) initCanvas(); // initialize canvas, only for the first run, in onCreate it didn't work
+
+
         if (event.sensor == accelerometer) {
             System.arraycopy(event.values, 0, mAccelerometerReading,
                     0, mAccelerometerReading.length);
-            updateOrientationAngles();
 
-        }
-        else if (event.sensor == magnetometer) {
-            System.arraycopy(event.values, 0, mMagnetometerReading,
-                    0, mMagnetometerReading.length);
-            double azimuth = updateOrientationAngles();
-            initCanvas();
+            double azimuth = updateOrientationAngles(); // when new acc data arrives, update angles
             if(iswalking) {
                 myview.updatePoints(azimuth,canvas);
                 floorplan.setImageBitmap(imageBitmap);
             }
 
-            // TODO some kind of latch, that only calls update orientation when both sensors are updated
-
+        }
+        else if (event.sensor == magnetometer) {
+            System.arraycopy(event.values, 0, mMagnetometerReading,
+                    0, mMagnetometerReading.length);
         }
 
 
 
         else if (event.sensor == linearaccelerometer) {
 
-            accmagnitude = Math.sqrt(event.values[0]*event.values[0]+event.values[2]*event.values[2]);
+            accmagnitude = Math.sqrt(event.values[0]*event.values[0]+event.values[2]*event.values[2]); // phone in horizontal pos, only z and y matters
             timestamp = event.timestamp;
             if(isRecord)writeAccValuesCSV(accmagnitude,timestamp);
             motionSensor(accmagnitude);
@@ -383,31 +373,32 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     public void initCanvas(){   // stackoverflow code
 
-        if(init) {
 
-            init = false;
+        init = false;
 
-            imageBitmap = Bitmap.createBitmap(floorplan.getWidth(), floorplan.getHeight(), Bitmap.Config.ARGB_8888);
+        floorplan=(ImageView)findViewById(R.id.floorplan);
 
-            imageBitmap = imageBitmap.copy(imageBitmap.getConfig(), true);
+        imageBitmap = Bitmap.createBitmap(floorplan.getWidth(), floorplan.getHeight(), Bitmap.Config.ARGB_8888);
 
-            canvas = new Canvas(imageBitmap);
+        imageBitmap = imageBitmap.copy(imageBitmap.getConfig(), true); // it has to be mutable to draw over the floorplan
 
-            Paint p = new Paint();
-            p.setColor(Color.RED);
+        canvas = new Canvas(imageBitmap);
 
-
-            floorplan.setBackgroundResource(R.drawable.floor_plan_v2_3);
-
-            myview = new MyView(getApplicationContext());
+        Paint p = new Paint();
+        p.setColor(Color.RED);
 
 
-            myview.onDraw(canvas);
+        floorplan.setBackgroundResource(R.drawable.floor_plan_v2_3);
+
+        myview = new MyView(getApplicationContext());
 
 
-            floorplan.setImageBitmap(imageBitmap);
-        }
+        myview.onDraw(canvas);
+
+
+        floorplan.setImageBitmap(imageBitmap);
     }
+
 
     public void resetInitialBelief() {
 
