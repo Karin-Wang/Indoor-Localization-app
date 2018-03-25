@@ -219,6 +219,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                 resetInitialBelief();
             }
         });
+
     }
 
     // onResume() registers the accelerometer for listening the events
@@ -245,27 +246,23 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-
-        if(init) initCanvas(); // initialize canvas, only for the first run, in onCreate it didn't work
-
+        if (init) initCanvas();
 
         if (event.sensor == accelerometer) {
             System.arraycopy(event.values, 0, mAccelerometerReading,
                     0, mAccelerometerReading.length);
 
             double azimuth = updateOrientationAngles(); // when new acc data arrives, update angles
+
             if(iswalking) {
                 myview.updatePoints(azimuth,canvas);
                 floorplan.setImageBitmap(imageBitmap);
             }
-
         }
         else if (event.sensor == magnetometer) {
             System.arraycopy(event.values, 0, mMagnetometerReading,
                     0, mMagnetometerReading.length);
         }
-
-
 
         else if (event.sensor == linearaccelerometer) {
 
@@ -273,7 +270,6 @@ public class MainActivity extends Activity implements SensorEventListener {
             timestamp = event.timestamp;
             if(isRecord)writeAccValuesCSV(accmagnitude,timestamp);
             motionSensor(accmagnitude);
-
         }
     }
 
@@ -367,7 +363,6 @@ public class MainActivity extends Activity implements SensorEventListener {
             samplecounter++;
 
         }
-
     }
 
 
@@ -378,7 +373,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         floorplan=(ImageView)findViewById(R.id.floorplan);
 
-        imageBitmap = Bitmap.createBitmap(floorplan.getWidth(), floorplan.getHeight(), Bitmap.Config.ARGB_8888);
+        imageBitmap = Bitmap.createBitmap(floorplan.getMeasuredWidth(), floorplan.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
 
         imageBitmap = imageBitmap.copy(imageBitmap.getConfig(), true); // it has to be mutable to draw over the floorplan
 
