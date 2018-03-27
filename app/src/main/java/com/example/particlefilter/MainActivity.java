@@ -48,9 +48,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private Sensor accelerometer;
     private Sensor linearaccelerometer;
     private Sensor magnetometer;
-    private Sensor stepcounter;
 
-    int stepcount = 0;
 
 
     private WifiManager wifiManager;
@@ -80,7 +78,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     private double sum = 0;
 
     boolean iswalking = false;
-    boolean init = true; // check if initialization has happened
 
     Bitmap imageBitmap;
     Canvas canvas;
@@ -88,7 +85,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     private double[] accarray = new double[5];
 
-    ImageView floorplan;
+    public ImageView floorplan;
     MyView myview;
 
 
@@ -157,19 +154,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             // No accelerometer!
         }
 
-        // if the default step counter exists
-        if (sensorManager.getDefaultSensor(Sensor.TYPE_STEP_DETECTOR) != null) {
-            // set step counter
-            stepcounter = sensorManager
-                    .getDefaultSensor(Sensor.TYPE_STEP_DETECTOR);
-            // register 'this' as a listener that updates values. Each time a sensor value changes,
-            // the method 'onSensorChanged()' is called.
-            sensorManager.registerListener(this, stepcounter,
-                    SensorManager.SENSOR_DELAY_NORMAL);
 
-        } else {
-            // No step counter
-        }
 
 
         // Set the wifi manager
@@ -220,6 +205,14 @@ public class MainActivity extends Activity implements SensorEventListener {
                 resetInitialBelief();
             }
         });
+
+        final Handler initHandler = new Handler();  // delay this task, prevent app from crash
+        initHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                initCanvas();
+            }
+        }, 300);  //the time is in miliseconds
     }
 
     // onResume() registers the accelerometer for listening the events
@@ -246,7 +239,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        if (init) initCanvas();
 
         if (event.sensor == accelerometer) {
             System.arraycopy(event.values, 0, mAccelerometerReading,
@@ -259,6 +251,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             System.arraycopy(event.values, 0, mMagnetometerReading,
                     0, mMagnetometerReading.length);
         }
+
 
         else if (event.sensor == linearaccelerometer) {
 
@@ -300,8 +293,6 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     public double updateOrientationAngles() {
         // Update rotation matrix, which is needed to update orientation angles.
-
-        final Handler handler = new Handler();
         Runnable runnable = new Runnable() {
 
             public void run() {
@@ -365,8 +356,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     public void initCanvas(){   // stackoverflow code
 
 
-        init = false;
-
         floorplan=(ImageView)findViewById(R.id.floorplan);
 
         imageBitmap = Bitmap.createBitmap(floorplan.getMeasuredWidth(), floorplan.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
@@ -388,7 +377,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         floorplan.setImageBitmap(imageBitmap);
 
 
-        final Handler myHandler = new Handler();  // set a handler for updating the points in every "delaymilis" time period
+        final Handler myHandler = new Handler();  // set a handler for updating the points in every "delaymilis" time period, code from stackoverflow
         myHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
