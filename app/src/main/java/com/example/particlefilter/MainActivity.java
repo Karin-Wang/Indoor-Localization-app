@@ -62,6 +62,9 @@ public class MainActivity extends Activity implements SensorEventListener {
     private long timestamp;
     String fileNameAcc;
 
+    Button buttonToggleFloor;
+    int floor = 3;
+
 
 
     String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
@@ -106,6 +109,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         fileNameAcc = "accData_" + curTime + ".csv";
 
         buttonReset = (Button) findViewById(R.id.reset);
+        buttonToggleFloor = (Button) findViewById(R.id.toggleFloor);
 
 
         // Set the sensor manager
@@ -206,6 +210,13 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         });
 
+        buttonToggleFloor.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                changeFloor();
+            }
+        });
+
         final Handler initHandler = new Handler();  // delay this task, prevent app from crash
         initHandler.postDelayed(new Runnable() {
             @Override
@@ -221,6 +232,8 @@ public class MainActivity extends Activity implements SensorEventListener {
         sensorManager.registerListener(this, accelerometer,
                 SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(this, magnetometer,
+                SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, linearaccelerometer,
                 SensorManager.SENSOR_DELAY_NORMAL);
     }
 
@@ -368,7 +381,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         p.setColor(Color.RED);
 
 
-        floorplan.setBackgroundResource(R.drawable.floor_plan_v2_3);
+        floorplan.setBackgroundResource(R.drawable.floorplan_final_3);
 
         myview = new MyView(getApplicationContext());
 
@@ -388,6 +401,26 @@ public class MainActivity extends Activity implements SensorEventListener {
                 myHandler.postDelayed(this,200);
             }
         }, 0);  //the time is in miliseconds
+
+
+    }
+
+    public void changeFloor(){
+
+        if (floor == 3){
+
+            floor = 4;
+            floorplan.setBackgroundResource(R.drawable.floorplan_final_4);
+            floorplan.setImageBitmap(imageBitmap);
+
+        } else {
+
+            floor = 3;
+            floorplan.setBackgroundResource(R.drawable.floorplan_final_3);
+            floorplan.setImageBitmap(imageBitmap);
+
+        }
+
 
 
     }

@@ -55,6 +55,17 @@
                 android:layout_weight="1"
                 android:text="Reset Initial Belief" />
 
+            <ToggleButton
+                android:id="@+id/toggleFloor"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:checked="false"
+                android:textOn="Change Floor"
+                android:textOff="Change Floor"
+                android:contentDescription="Change Floor"
+                android:text="Change Floor" />
+
         </LinearLayout>
 
     </LinearLayout>

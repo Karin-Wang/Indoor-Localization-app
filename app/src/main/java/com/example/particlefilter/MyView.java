@@ -101,9 +101,6 @@ public class MyView extends View {   // stackoverflow code
                     curPoint.x += (float) (Math.cos(angle) * 5);
                     curPoint.y += (float) (Math.sin(angle) * 5);
 
-                    if(isWall(curPoint)) {
-                        points.remove(this);
-                    }
                 }
             }
         };
@@ -113,12 +110,5 @@ public class MyView extends View {   // stackoverflow code
 
     }
 
-    public boolean isWall(Point curPoint){
-
-        if(curPoint.x < 0 || curPoint.y < 0){  // out of image boundaries
-            return true;
-        } else return false;
-
-    }
 
 }
