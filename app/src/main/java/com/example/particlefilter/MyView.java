@@ -18,14 +18,15 @@ import java.util.Iterator;
 public class MyView extends View {   // stackoverflow code
 
     Paint paint;
-    ArrayList<Point> points = new ArrayList<>();
-    Iterator<Point> iterator;
+
+    ArrayList<Particle> particles = new ArrayList<>();
+    Iterator<Particle> iterator;
 
 
 
     public float x;
     public float y;
-    public int radius = 10;
+    public int radius = 20;
 
 
 
@@ -64,25 +65,27 @@ public class MyView extends View {   // stackoverflow code
         super.onDraw(canvas);
 
 
-        iterator = points.iterator();
-
+        iterator = particles.iterator();
     
         while (iterator.hasNext()) {
 
-            Point curPoint = iterator.next();
+            Particle curParticle = iterator.next();
 
-            canvas.drawCircle(curPoint.x, curPoint.y, radius, paint);
+            canvas.drawCircle(curParticle.x, curParticle.y, (float)curParticle.weight*radius, paint);
 
         }
     }
 
 
     public void populateArrayList(){
-        points.clear();
-        points.add(new Point(1000, 400));
-        points.add(new Point(200, 400));
-        points.add(new Point(1600, 400));
+        particles.clear();
+        particles.add(new Particle(1000, 400, 0, 0.2));
+        particles.add(new Particle(200, 400, 0, 0.2));
+        particles.add(new Particle(1000, 400, 0.5, 0.6));
+        particles.add(new Particle(1000, 400, -0.5, 0.5));
+        particles.add(new Particle(1600, 400, 0, 0.4));
     }
+
 
     public void updatePoints(double azimuth,Canvas canvas){
 
@@ -92,14 +95,14 @@ public class MyView extends View {   // stackoverflow code
 
             public void run() {
 
-                iterator = points.iterator();
+                iterator = particles.iterator();
 
                 while (iterator.hasNext()) {
 
-                    Point curPoint = iterator.next();
+                    Particle curParticle = iterator.next();
 
-                    curPoint.x += (float) (Math.cos(angle) * 5);
-                    curPoint.y += (float) (Math.sin(angle) * 5);
+                    curParticle.x += (float) (Math.cos(angle+curParticle.angularerror) * 5);
+                    curParticle.y += (float) (Math.sin(angle+curParticle.angularerror) * 5);
 
                 }
             }
@@ -110,5 +113,54 @@ public class MyView extends View {   // stackoverflow code
 
     }
 
+
+}
+
+class Particle{
+
+
+    public float x;
+    public float y;
+    public double angularerror;
+    public double weight;
+
+    Particle(float x, float y, double angularerror, double weight){
+        this.x = x;
+        this.y = y;
+        this.angularerror = angularerror;
+        this.weight = weight;
+    }
+
+    public float getX() {
+        return this.x;
+    }
+
+    public float getY() {
+        return this.y;
+    }
+
+    public double getAngularerror() {
+        return this.angularerror;
+    }
+
+    public double getWeight() {
+        return this.weight;
+    }
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
+    public void setAngle(double angularerror) {
+        this.angularerror = angularerror;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
 
 }
