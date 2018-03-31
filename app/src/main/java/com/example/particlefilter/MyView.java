@@ -23,9 +23,7 @@ public class MyView extends View {   // stackoverflow code
     Paint paint;
 
     ArrayList<Particle> particles = new ArrayList<>();
-    Iterator<Particle> iterator;
-
-
+    volatile Iterator<Particle> iterator;
 
     public float x;
     public float y;
