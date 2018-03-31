@@ -83,13 +83,13 @@ public class MyView extends View {   // stackoverflow code
 
     public void populateArrayList(){
         particles.clear();
-        //particles.add(new Particle(1920, 782, 0, 1));
+        //particles.add(new Particle(1, 782, 0, 0.2));
         //particles.add(new Particle(200, 400, 0, 0.2));
-        //particles.add(new Particle(1000, 400, 0.5, 0.6));
-        particles.add(new Particle(1000, 400, 0, 0.4));
+        //particles.add(new Particle(1000, 400, 0.5, 0.1));
+        //particles.add(new Particle(1000, 400, 0, 0.4));
         //particles.add(new Particle(1, 1, -0.5, 1));
-        //particles.add(new Particle(1700, 800, -0.5, 1));
-        //particles.add(new Particle(400, 400, 0, 0.4));
+        //particles.add(new Particle(1920, 804, -0.5, 1));
+        particles.add(new Particle(1000, 400, 0, 0.4));
     }
 
 
@@ -108,21 +108,24 @@ public class MyView extends View {   // stackoverflow code
                     Particle curParticle = iterator.next();
 
                     curParticle.x += (float) (Math.cos(angle+curParticle.angularerror) * 5);
-                    curParticle.y += (float) (Math.sin(angle+curParticle.angularerror) * 5);
+                    curParticle.y += (float) (Math.sin(angle+curParticle.angularerror) * 5)*MainActivity.getRatio();
 
                     Log.d("X: ",String.valueOf(curParticle.x));
                     Log.d("Y: ",String.valueOf(curParticle.y));
 
                     Bitmap maskBitmap = MainActivity.getMaskBitmap();
-                    int color = maskBitmap.getPixel(((int)curParticle.x)*3,((int)curParticle.y)*3);
+                    int color = maskBitmap.getPixel(((int)curParticle.x)*3,((int)(curParticle.y*MainActivity.getRatio()*3)));
 
 
                     int redcomponent = (color >> 16) & 0xff;
 
                     Log.d("R: ", String.valueOf(redcomponent));
                     if (redcomponent < 255) {
+
+                        // TODO do stuff here
                         curParticle.x = 1000;
                         curParticle.y = 400;
+
                     }
                 }
             }

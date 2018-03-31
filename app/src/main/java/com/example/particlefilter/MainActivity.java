@@ -95,6 +95,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     public ImageView floorplan;
     MyView myview;
 
+    public static float ratio;
 
 
 
@@ -385,6 +386,9 @@ public class MainActivity extends Activity implements SensorEventListener {
         maskBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_3 ,options);
 
 
+        ratio = options.outHeight / floorplan.getMeasuredHeight();
+
+
         int color = maskBitmap.getPixel(1,1);
         int asd = (color >> 16) & 0xff;
         Log.d("black", String.valueOf(asd));
@@ -431,7 +435,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
 
-
     public void changeFloor(){
 
         if (floor == 3){
@@ -467,6 +470,10 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         return maskBitmap;
 
+    }
+
+    public static float getRatio(){
+        return ratio;
     }
 }
 
