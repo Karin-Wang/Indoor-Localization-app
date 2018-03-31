@@ -410,7 +410,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         p.setColor(Color.RED);
 
 
-        floorplan.setBackgroundResource(R.drawable.floorplan_mask_3_v3);
+        floorplan.setBackgroundResource(R.drawable.floorplan_final_3_v3);
 
         myview = new MyView(getApplicationContext());
 
@@ -440,14 +440,14 @@ public class MainActivity extends Activity implements SensorEventListener {
         if (floor == 3){
 
             floor = 4;
-            floorplan.setBackgroundResource(R.drawable.floorplan_mask_3_v3);
+            floorplan.setBackgroundResource(R.drawable.floorplan_final_4_v3);
             //floorplan.setImageResource(R.drawable.floorplan_final_4_v2);
             floorplan.setImageBitmap(imageBitmap);
 
         } else {
 
             floor = 3;
-            floorplan.setBackgroundResource(R.drawable.floorplan_final_4_v3);
+            floorplan.setBackgroundResource(R.drawable.floorplan_final_3_v3);
             //floorplan.setImageResource(R.drawable.floorplan_final_3_v2);
             floorplan.setImageBitmap(imageBitmap);
 
