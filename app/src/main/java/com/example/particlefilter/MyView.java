@@ -1,11 +1,14 @@
 package com.example.particlefilter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -64,6 +67,7 @@ public class MyView extends View {   // stackoverflow code
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        canvas.drawColor(0, PorterDuff.Mode.CLEAR);
 
         iterator = particles.iterator();
     
@@ -79,15 +83,17 @@ public class MyView extends View {   // stackoverflow code
 
     public void populateArrayList(){
         particles.clear();
-        particles.add(new Particle(1000, 400, 0, 0.2));
-        particles.add(new Particle(200, 400, 0, 0.2));
-        particles.add(new Particle(1000, 400, 0.5, 0.6));
-        particles.add(new Particle(1000, 400, -0.5, 0.5));
-        particles.add(new Particle(1600, 400, 0, 0.4));
+        //particles.add(new Particle(1920, 782, 0, 1));
+        //particles.add(new Particle(200, 400, 0, 0.2));
+        //particles.add(new Particle(1000, 400, 0.5, 0.6));
+        particles.add(new Particle(1000, 400, 0, 0.4));
+        //particles.add(new Particle(1, 1, -0.5, 1));
+        //particles.add(new Particle(1700, 800, -0.5, 1));
+        //particles.add(new Particle(400, 400, 0, 0.4));
     }
 
 
-    public void updatePoints(double azimuth,Canvas canvas){
+    public void updatePoints(double azimuth, final Canvas canvas){
 
         final double angle = azimuth;
 
@@ -104,6 +110,20 @@ public class MyView extends View {   // stackoverflow code
                     curParticle.x += (float) (Math.cos(angle+curParticle.angularerror) * 5);
                     curParticle.y += (float) (Math.sin(angle+curParticle.angularerror) * 5);
 
+                    Log.d("X: ",String.valueOf(curParticle.x));
+                    Log.d("Y: ",String.valueOf(curParticle.y));
+
+                    Bitmap maskBitmap = MainActivity.getMaskBitmap();
+                    int color = maskBitmap.getPixel(((int)curParticle.x)*3,((int)curParticle.y)*3);
+
+
+                    int redcomponent = (color >> 16) & 0xff;
+
+                    Log.d("R: ", String.valueOf(redcomponent));
+                    if (redcomponent < 255) {
+                        curParticle.x = 1000;
+                        curParticle.y = 400;
+                    }
                 }
             }
         };

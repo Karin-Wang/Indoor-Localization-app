@@ -1,6 +1,8 @@
 package com.example.particlefilter;
 
 import android.app.Activity;
+import android.content.res.Resources;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.net.wifi.ScanResult;
@@ -13,6 +15,7 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -82,7 +85,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     boolean iswalking = false;
 
-    Bitmap imageBitmap;
+    public Bitmap imageBitmap;
+    public static Bitmap maskBitmap;
     Canvas canvas;
     Button buttonReset;
 
@@ -375,13 +379,34 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         imageBitmap = imageBitmap.copy(imageBitmap.getConfig(), true); // it has to be mutable to draw over the floorplan
 
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        maskBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_3 ,options);
+
+
+        int color = maskBitmap.getPixel(1,1);
+        int asd = (color >> 16) & 0xff;
+        Log.d("black", String.valueOf(asd));
+
+        color = maskBitmap.getPixel(900*3,500*3);
+        asd = (color >> 16) & 0xff;
+        Log.d("white", String.valueOf(asd));
+
+        Log.d("height", String.valueOf(imageBitmap.getHeight()));
+        Log.d("width", String.valueOf(imageBitmap.getWidth()));
+
+        Log.d("mheight", String.valueOf(maskBitmap.getHeight()));
+        Log.d("mheight", String.valueOf(maskBitmap.getWidth()));
+
+
         canvas = new Canvas(imageBitmap);
 
         Paint p = new Paint();
         p.setColor(Color.RED);
 
 
-        floorplan.setBackgroundResource(R.drawable.floorplan_final_3);
+        floorplan.setBackgroundResource(R.drawable.floorplan_mask_3);
 
         myview = new MyView(getApplicationContext());
 
@@ -405,12 +430,14 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     }
 
+
+
     public void changeFloor(){
 
         if (floor == 3){
 
             floor = 4;
-            floorplan.setBackgroundResource(R.drawable.floorplan_final_4);
+            floorplan.setBackgroundResource(R.drawable.floorplan_mask_3);
             floorplan.setImageBitmap(imageBitmap);
 
         } else {
@@ -425,7 +452,6 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     }
 
-
     public void resetInitialBelief() {
 
         canvas.drawColor(0, PorterDuff.Mode.CLEAR);
@@ -434,6 +460,12 @@ public class MainActivity extends Activity implements SensorEventListener {
         myview.onDraw(canvas);
 
         floorplan.setImageBitmap(imageBitmap);
+
+    }
+
+    public static Bitmap getMaskBitmap(){
+
+        return maskBitmap;
 
     }
 }
