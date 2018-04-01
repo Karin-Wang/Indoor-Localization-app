@@ -23,7 +23,7 @@ public class MyView extends View {   // stackoverflow code
     Paint paint;
 
     ArrayList<Particle> particles = new ArrayList<>();
-    volatile Iterator<Particle> iterator;
+    Iterator<Particle> iterator;
 
     public float x;
     public float y;
@@ -103,29 +103,32 @@ public class MyView extends View {   // stackoverflow code
 
                 iterator = particles.iterator();
 
-                while (iterator.hasNext()) {
+                synchronized (this) {
 
-                    Particle curParticle = iterator.next();
+                    while (iterator.hasNext()) {
 
-                    curParticle.x += (float) (Math.cos(angle+curParticle.angularerror) * 5);
-                    curParticle.y += (float) (Math.sin(angle+curParticle.angularerror) * 5);
+                        Particle curParticle = iterator.next();
 
-                    Log.d("X: ",String.valueOf(curParticle.x));
-                    Log.d("Y: ",String.valueOf(curParticle.y));
+                        curParticle.x += (float) (Math.cos(angle + curParticle.angularerror) * 5);
+                        curParticle.y += (float) (Math.sin(angle + curParticle.angularerror) * 5);
 
-                    Bitmap maskBitmap = MainActivity.getMaskBitmap();
-                    int color = maskBitmap.getPixel(((int)curParticle.x)*3,((int)(curParticle.y*3)));
+                        Log.d("X: ", String.valueOf(curParticle.x));
+                        Log.d("Y: ", String.valueOf(curParticle.y));
+
+                        Bitmap maskBitmap = MainActivity.getMaskBitmap();
+                        int color = maskBitmap.getPixel(((int) curParticle.x) * 3, ((int) (curParticle.y * 3)));
 
 
-                    int redcomponent = (color >> 16) & 0xff;
+                        int redcomponent = (color >> 16) & 0xff;
 
-                    Log.d("R: ", String.valueOf(redcomponent));
-                    if (redcomponent < 255) {
+                        Log.d("R: ", String.valueOf(redcomponent));
+                        if (redcomponent < 255) {
 
-                        // TODO do stuff here
-                        curParticle.x = 1000;
-                        curParticle.y = 400;
+                            // TODO do stuff here
+                            curParticle.x = 1000;
+                            curParticle.y = 400;
 
+                        }
                     }
                 }
             }
