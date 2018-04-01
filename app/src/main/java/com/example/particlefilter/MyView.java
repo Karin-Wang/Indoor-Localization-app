@@ -158,15 +158,14 @@ public class MyView extends View {   // stackoverflow code
                             toBeRemoved.add(cntr);
 
                         }
-                        cntr++;
                     }
                 }
             }
         };
         new Thread(runnable).start();
-        for (Integer delete_index : toBeRemoved){
+        for (Integer remove : toBeRemoved){
 
-            particles.remove(delete_index);
+            particles.remove(remove);
 
         }
 
