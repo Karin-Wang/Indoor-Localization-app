@@ -13,6 +13,7 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by Daniel on 2018. 03. 23..
@@ -22,7 +23,8 @@ public class MyView extends View {   // stackoverflow code
 
     Paint paint;
 
-    ArrayList<Particle> particles = new ArrayList<>();
+    CopyOnWriteArrayList<Particle> particles = new CopyOnWriteArrayList<>();
+    CopyOnWriteArrayList<Integer> toBeRemoved = new CopyOnWriteArrayList<>();
     Iterator<Particle> iterator;
 
     public float x;
@@ -109,7 +111,7 @@ public class MyView extends View {   // stackoverflow code
 
                 if ((redcomponent) == 255) {
                     particles.add(new Particle(i, j, 0, 0.1));
-                    //Log.d("add ","index: "+cntr+"x: "+String.valueOf(i)+" y "+String.valueOf(j));
+                    Log.d("add ","index: "+cntr+"x: "+String.valueOf(i)+" y "+String.valueOf(j));
                     cntr++;
                 }
             }
@@ -129,6 +131,7 @@ public class MyView extends View {   // stackoverflow code
             public void run() {
 
                 iterator = particles.iterator();
+                int cntr = 0;
 
                 synchronized (this) {
 
@@ -152,14 +155,21 @@ public class MyView extends View {   // stackoverflow code
                         if (redcomponent < 255) {
 
                             // TODO do stuff here
-                            
+                            toBeRemoved.add(cntr);
 
                         }
+                        cntr++;
                     }
                 }
             }
         };
         new Thread(runnable).start();
+        for (Integer delete_index : toBeRemoved){
+
+            particles.remove(delete_index);
+
+        }
+
 
         this.onDraw(canvas);
 
