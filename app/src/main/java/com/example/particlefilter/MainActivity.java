@@ -460,7 +460,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     public void resetInitialBelief() {
 
         canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-        myview.populateArrayList();
+        myview.populateParticles();
 
         myview.onDraw(canvas);
 

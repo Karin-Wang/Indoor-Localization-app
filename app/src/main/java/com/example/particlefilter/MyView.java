@@ -56,7 +56,8 @@ public class MyView extends View {   // stackoverflow code
         // Load attributes
         paint = new Paint();
         paint.setColor(Color.RED);
-        populateArrayList();
+        //populateArrayList();
+        populateParticles();
 
     }
 
@@ -93,6 +94,32 @@ public class MyView extends View {   // stackoverflow code
     }
 
 
+    public int populateParticles(){
+        particles.clear();
+
+        int cntr = 0;
+        int STEP = 20;
+        Bitmap mask = MainActivity.getMaskBitmap();
+
+        for (int i = 0; i < mask.getWidth()/3;i=i+STEP){
+            for (int j = 0; j < mask.getHeight()/3;j=j+STEP){
+
+                int color = mask.getPixel(i*3,j*3);
+                int redcomponent = (color >> 16) & 0xff;
+
+                if ((redcomponent) == 255) {
+                    particles.add(new Particle(i, j, 0, 0.1));
+                    //Log.d("add ","index: "+cntr+"x: "+String.valueOf(i)+" y "+String.valueOf(j));
+                    cntr++;
+                }
+            }
+        }
+
+        return cntr;
+
+    }
+
+
     public void updatePoints(double azimuth, final Canvas canvas){
 
         final double angle = azimuth;
@@ -112,8 +139,8 @@ public class MyView extends View {   // stackoverflow code
                         curParticle.x += (float) (Math.cos(angle + curParticle.angularerror) * 5);
                         curParticle.y += (float) (Math.sin(angle + curParticle.angularerror) * 5);
 
-                        Log.d("X: ", String.valueOf(curParticle.x));
-                        Log.d("Y: ", String.valueOf(curParticle.y));
+                        //Log.d("X: ", String.valueOf(curParticle.x));
+                        //Log.d("Y: ", String.valueOf(curParticle.y));
 
                         Bitmap maskBitmap = MainActivity.getMaskBitmap();
                         int color = maskBitmap.getPixel(((int) curParticle.x) * 3, ((int) (curParticle.y * 3)));
@@ -121,12 +148,11 @@ public class MyView extends View {   // stackoverflow code
 
                         int redcomponent = (color >> 16) & 0xff;
 
-                        Log.d("R: ", String.valueOf(redcomponent));
+                        //Log.d("R: ", String.valueOf(redcomponent));
                         if (redcomponent < 255) {
 
                             // TODO do stuff here
-                            curParticle.x = 1000;
-                            curParticle.y = 400;
+                            
 
                         }
                     }
