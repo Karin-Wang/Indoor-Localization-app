@@ -90,9 +90,10 @@ public class MyView extends View {   // stackoverflow code
         //particles.add(new Particle(200, 400, 0, 0.2));
         particles.add(new Particle(1000, 400, 0.5, 0.1));
         particles.add(new Particle(1000, 400, 0, 0.4));
+        particles.add(new Particle(1000, 400, -0.5, 0.4));
         //particles.add(new Particle(1, 1, -0.5, 1));
         //particles.add(new Particle(1920, 804, -0.5, 1));
-        particles.add(new Particle(1622/2, 1080/2, 0, 0.4));
+        //particles.add(new Particle(1622/2, 1080/2, 0, 0.4));
     }
 
 
@@ -155,7 +156,8 @@ public class MyView extends View {   // stackoverflow code
                         if (redcomponent < 255) {
 
                             // TODO do stuff here
-                            toBeRemoved.add(cntr);
+                            curParticle.x = 1000;
+                            curParticle.y = 400;
 
                         }
                     }
@@ -163,12 +165,6 @@ public class MyView extends View {   // stackoverflow code
             }
         };
         new Thread(runnable).start();
-        for (Integer remove : toBeRemoved){
-
-            particles.remove(remove);
-
-        }
-
 
         this.onDraw(canvas);
 
