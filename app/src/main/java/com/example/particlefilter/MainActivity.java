@@ -66,7 +66,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     String fileNameAcc;
 
     Button buttonToggleFloor;
-    int floor = 3;
+    public static int floor = 3;
 
 
 
@@ -86,7 +86,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     boolean iswalking = false;
 
     public Bitmap imageBitmap;
-    public static Bitmap maskBitmap;
+    public static Bitmap maskBitmap,maskBitmap3,maskBitmap4;
     Canvas canvas;
     Button buttonReset;
 
@@ -95,7 +95,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     public ImageView floorplan;
     MyView myview;
 
-    public static float ratio;
+
 
 
 
@@ -383,25 +383,12 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        maskBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_3_v3 ,options);
 
+        maskBitmap3 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_3_v3 ,options);
+        maskBitmap4 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_4_v3 ,options);
 
-        ratio = options.outHeight / floorplan.getMeasuredHeight();
+        maskBitmap = maskBitmap3;
 
-
-        int color = maskBitmap.getPixel(1,1);
-        int asd = (color >> 16) & 0xff;
-        Log.d("black", String.valueOf(asd));
-
-        color = maskBitmap.getPixel(900*3,500*3);
-        asd = (color >> 16) & 0xff;
-        Log.d("white", String.valueOf(asd));
-
-        Log.d("height", String.valueOf(imageBitmap.getHeight()));
-        Log.d("width", String.valueOf(imageBitmap.getWidth()));
-
-        Log.d("mheight", String.valueOf(maskBitmap.getHeight()));
-        Log.d("mheight", String.valueOf(maskBitmap.getWidth()));
 
 
         canvas = new Canvas(imageBitmap);
@@ -470,12 +457,21 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     public static Bitmap getMaskBitmap(){
 
+        if (floor == 3) {
+            //maskBitmap.recycle();
+            maskBitmap = null;
+            maskBitmap = maskBitmap3;
+        }
+
+        if (floor == 4) {
+            //maskBitmap.recycle();
+            maskBitmap = null;
+            maskBitmap = maskBitmap4;
+        }
+
         return maskBitmap;
 
     }
 
-    public static float getRatio(){
-        return ratio;
-    }
 }
 

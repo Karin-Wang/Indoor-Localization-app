@@ -116,7 +116,7 @@ public class MyView extends View {   // stackoverflow code
                         for (int angle = 0; angle < anglevector.length; angle++){
 
                             particles.add(new Particle(i, j, anglevector[angle], 0.1, speedvector[speed]));
-                            Log.d("add "," index: "+cntr+" x: "+String.valueOf(i)+" y "+String.valueOf(j)+"angleerr: "+ String.valueOf(anglevector[angle])+" speederr: "+String.valueOf(speedvector[speed]));
+                            Log.d("add "," index: "+cntr+" x: "+String.valueOf(i)+" y "+String.valueOf(j)+" angleerr: "+ String.valueOf(anglevector[angle])+" speederr: "+String.valueOf(speedvector[speed]));
                             cntr++;
 
                         }
