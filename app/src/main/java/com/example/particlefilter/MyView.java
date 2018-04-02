@@ -25,8 +25,7 @@ public class MyView extends View {   // stackoverflow code
     Paint paint;
 
     CopyOnWriteArrayList<Particle> particles = new CopyOnWriteArrayList<>();
-    CopyOnWriteArrayList<Integer> toBeRemoved = new CopyOnWriteArrayList<>();
-    Iterator<Particle> iterator;
+
 
     public float x;
     public float y;
@@ -73,11 +72,11 @@ public class MyView extends View {   // stackoverflow code
 
         //canvas.setBitmap(imageBitmap);
 
-        iterator = particles.iterator();
+        Iterator<Particle> drawiterator = particles.iterator();
 
-        while (iterator.hasNext()) {
+        while (drawiterator.hasNext()) {
 
-            Particle curParticle = iterator.next();
+            Particle curParticle = drawiterator.next();
 
             canvas.drawCircle(curParticle.x, curParticle.y, (float)curParticle.weight*radius, paint);
 
@@ -130,17 +129,25 @@ public class MyView extends View {   // stackoverflow code
 
     }
 
-    public  CopyOnWriteArrayList<Particle> resampling(CopyOnWriteArrayList<Particle> newParticles, int count){
-        CopyOnWriteArrayList<Particle> particles_next = newParticles;
-        Random random = new Random();
-        int rd = 0;
-        int temp = particles.size() - newParticles.size();
-        for (int i=0; i<temp; i++){
-            rd = random.nextInt(newParticles.size());
-            particles_next.add(newParticles.get(rd));
-        }
-        return particles_next;
+    public void resampling(CopyOnWriteArrayList<Particle> alive, CopyOnWriteArrayList<Particle> dead){
 
+        Random random = new Random();
+
+
+        for (int index = 0; index < dead.size(); index++){
+
+            int randomnumber = random.nextInt(alive.size());
+
+            Particle randomParticle = alive.get(randomnumber);
+            Particle currentDeadParticle = dead.get(index);
+
+            currentDeadParticle.x = randomParticle.x;
+            currentDeadParticle.y = randomParticle.y;
+
+            alive.add(currentDeadParticle);
+        }
+
+        particles = alive;
     }
 
 
@@ -152,10 +159,10 @@ public class MyView extends View {   // stackoverflow code
 
             public void run() {
 
-                iterator = particles.iterator();
+                Iterator<Particle> iterator = particles.iterator();
                 int cntr = 0;
-                int Count = 0;
-                CopyOnWriteArrayList<Particle> newParticles = new CopyOnWriteArrayList<>();
+                CopyOnWriteArrayList<Particle> aliveParticles = new CopyOnWriteArrayList<>();
+                CopyOnWriteArrayList<Particle> deadParticles = new CopyOnWriteArrayList<>();
 
                 synchronized (this) {
 
@@ -179,15 +186,22 @@ public class MyView extends View {   // stackoverflow code
                         if (redcomponent < 255) {
 
                             // TODO do stuff here
-//                            curParticle.x = 1000;
-//                            curParticle.y = 400;
-                            Count ++;
+//
+                            deadParticles.add(curParticle);
                         }
                         else{
-                            newParticles.add(curParticle);
+                            aliveParticles.add(curParticle);
                         }
+                        cntr++;
                     }
-                    particles = resampling(newParticles, Count);
+                    Log.d("particlebefore: ", String.valueOf(particles.size()));
+                    Log.d("new: ", String.valueOf(aliveParticles.size()));
+                    Log.d("dead: ", String.valueOf(deadParticles.size()));
+                    Log.d("cntr: ", String.valueOf(cntr));
+                    resampling(aliveParticles, deadParticles);
+                    Log.d("particleafter: ", String.valueOf(particles.size()));
+                    Log.d("new: ", String.valueOf(aliveParticles.size()));
+                    Log.d("dead: ", String.valueOf(deadParticles.size()));
                 }
             }
         };
