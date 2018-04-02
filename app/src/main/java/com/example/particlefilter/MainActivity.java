@@ -57,7 +57,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private WifiManager wifiManager;
 
 
-    private TextView textstep,textaz;
+    private TextView textstep,textaz,textbay;
 
     Button buttonAccRecord;
     private boolean isRecord = false;
@@ -65,7 +65,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private long timestamp;
     String fileNameAcc;
 
-    Button buttonToggleFloor;
+    Button buttonToggleFloor, buttonBayes;
     public static int floor = 3;
 
 
@@ -108,6 +108,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         // Create the text views.
         textstep = (TextView) findViewById(R.id.textSTEPCOUNT);
         textaz = (TextView) findViewById(R.id.textROTAZ);
+        textbay = (TextView) findViewById(R.id.textBAYESIAN);
 
         // create buttons
         //buttonAccRecord = (Button) findViewById(R.id.recordAcc);
@@ -115,6 +116,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         buttonReset = (Button) findViewById(R.id.reset);
         buttonToggleFloor = (Button) findViewById(R.id.toggleFloor);
+        buttonBayes = (Button) findViewById(R.id.bayes);
 
 
         // Set the sensor manager
@@ -225,6 +227,15 @@ public class MainActivity extends Activity implements SensorEventListener {
             @Override
             public void onClick(View v) {
                 changeFloor();
+            }
+        });
+
+        buttonBayes.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //int guess = Bayesian.bayes();
+                int guess = 5;
+                textbay.setText("Guess: "+String.valueOf(guess));
             }
         });
 

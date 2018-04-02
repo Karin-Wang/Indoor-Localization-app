@@ -36,6 +36,27 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
+            <Button
+                android:id="@+id/bayes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Bayes" />
+
+            <TextView
+                android:id="@+id/textBAYESIAN"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="center" />
+
+            <Button
+                android:id="@+id/reset"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Reset PF" />
+
             <TextView
                 android:id="@+id/textSTEPCOUNT"
                 android:layout_width="match_parent"
@@ -50,23 +71,15 @@
                 android:layout_weight="1"
                 android:textAlignment="center" />
 
-            <Button
-                android:id="@+id/reset"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Reset Initial" />
-
             <ToggleButton
                 android:id="@+id/toggleFloor"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:checked="false"
-                android:contentDescription="Change Floor"
-                android:text="Change Floor"
-                android:textOff="Change Floor"
-                android:textOn="Change Floor" />
+                android:text="Floor"
+                android:textOff="Floor 3"
+                android:textOn="Floor 4" />
 
         </LinearLayout>
 

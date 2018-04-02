@@ -166,6 +166,8 @@ public class MyView extends View {   // stackoverflow code
                             curParticle.x = 1000;
                             curParticle.y = 400;
 
+
+
                         }
                     }
                 }
