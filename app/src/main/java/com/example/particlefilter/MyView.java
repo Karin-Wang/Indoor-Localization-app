@@ -14,7 +14,7 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.Random
+import java.util.Random;
 
 /**
  * Created by Daniel on 2018. 03. 23..
