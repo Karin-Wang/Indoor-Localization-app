@@ -130,14 +130,16 @@ public class MyView extends View {   // stackoverflow code
 
     }
 
-    public void resampling(CopyOnWriteArrayList<Particle> newParticles, int count){
-        particles = newParticles;
+    public  CopyOnWriteArrayList<Particle> resampling(CopyOnWriteArrayList<Particle> newParticles, int count){
+        CopyOnWriteArrayList<Particle> particles_next = newParticles;
         Random random = new Random();
         int rd = 0;
-        for (int i=0; i<count; i++){
-            rd = random.nextInt(newParticles.size() - 0 + 1) + 0;
-            particles.add(newParticles.get(rd));
+        int temp = particles.size() - newParticles.size();
+        for (int i=0; i<temp; i++){
+            rd = random.nextInt(newParticles.size());
+            particles_next.add(newParticles.get(rd));
         }
+        return particles_next;
 
     }
 
@@ -185,7 +187,7 @@ public class MyView extends View {   // stackoverflow code
                             newParticles.add(curParticle);
                         }
                     }
-                    resampling(newParticles, Count);
+                    particles = resampling(newParticles, Count);
                 }
             }
         };
