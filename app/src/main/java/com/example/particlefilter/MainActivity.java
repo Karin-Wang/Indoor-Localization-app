@@ -233,7 +233,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         buttonBayes.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                //int guess = Bayesian.bayes();
+                //int guess = Bayesian.bayes();sdf
                 int guess = 5;
                 textbay.setText("Guess: "+String.valueOf(guess));
             }
