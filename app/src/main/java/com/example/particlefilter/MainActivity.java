@@ -145,7 +145,13 @@ public class MainActivity extends Activity implements SensorEventListener {
                     SensorManager.SENSOR_DELAY_NORMAL);
 
         } else {
-            // No accelerometer!
+            // set accelerometer
+            linearaccelerometer = sensorManager
+                    .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+            // register 'this' as a listener that updates values. Each time a sensor value changes,
+            // the method 'onSensorChanged()' is called.
+            sensorManager.registerListener(this, linearaccelerometer,
+                    SensorManager.SENSOR_DELAY_NORMAL);
         }
 
         // if the default magnetometer exists
