@@ -14,6 +14,7 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Random;
 
 /**
  * Created by Daniel on 2018. 03. 23..
@@ -73,7 +74,7 @@ public class MyView extends View {   // stackoverflow code
         //canvas.setBitmap(imageBitmap);
 
         iterator = particles.iterator();
-    
+
         while (iterator.hasNext()) {
 
             Particle curParticle = iterator.next();
@@ -129,6 +130,17 @@ public class MyView extends View {   // stackoverflow code
 
     }
 
+    public void resampling(CopyOnWriteArrayList<Particle> newParticles, int count){
+        particles = newParticles;
+        Random random = new Random();
+        int rd = 0;
+        for (int i=0; i<count; i++){
+            rd = random.nextInt(newParticles.size() - 0 + 1) + 0;
+            particles.add(newParticles.get(rd));
+        }
+
+    }
+
 
     public void updatePoints(double azimuth, final Canvas canvas){
 
@@ -140,6 +152,8 @@ public class MyView extends View {   // stackoverflow code
 
                 iterator = particles.iterator();
                 int cntr = 0;
+                int Count = 0;
+                CopyOnWriteArrayList<Particle> newParticles = new CopyOnWriteArrayList<>();
 
                 synchronized (this) {
 
@@ -163,13 +177,15 @@ public class MyView extends View {   // stackoverflow code
                         if (redcomponent < 255) {
 
                             // TODO do stuff here
-                            curParticle.x = 1000;
-                            curParticle.y = 400;
-
-
-
+//                            curParticle.x = 1000;
+//                            curParticle.y = 400;
+                            Count ++;
+                        }
+                        else{
+                            newParticles.add(curParticle);
                         }
                     }
+                    resampling(newParticles, Count);
                 }
             }
         };
