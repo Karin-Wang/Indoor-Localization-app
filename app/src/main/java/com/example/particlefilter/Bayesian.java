@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiManager;
 
 /**
  * Created by Kaering on 3/30/18.
@@ -22,6 +24,14 @@ public class Bayesian {
     private double threshold = 0.9;
     private int maxIter = 10;
     String filename = "";
+
+    private int predict;
+    double[][] prior;
+    double[][] post;
+    int iteration;
+    int j;
+    double proba;
+
 
     public void getRadioMap(){
         try {
@@ -62,46 +72,96 @@ public class Bayesian {
         return list;
     }
 
-
-    public int bayes(Map<String, Integer> test_data){
-        int predict = -1;
-        double[] prior = new double[19];
-        for (int i = 0; i<19; i++){
-            prior[i] = 1/19;
-        }
-        double[] post = prior.clone();
-        int iteration = 0;
-        int j = 0;
-        double proba = 0;
-
-        while(proba <= threshold){
-            prior = post.clone();
-            j = 0;
-            double[] overall_post = new double[19];
-            for (int i = 0; i<19; i++){
-                overall_post[i] = 0;
+    public double[] matrixOperation(double[] a1, double[] a2, String op){
+        double[] res = new double[a1.length];
+        if (op.equals("*")){
+            for (int i = 0; i < a1.length; i++){
+                res[i] = a1[i] * a2[i];
             }
-            List<Entry<String, Integer>>sorted_test_data = sortMap(test_data);
-            for (int item = 0; item<30; item++){
-                double[] pdf = new double[19];
-                for (int i = 0; i<19; i++){
-                    pdf[i] = 0;
-                }
-                for (int cell = 0; cell< 19; cell++){
-                    String AP = sorted_test_data.get(item).getKey();
-                    NormalDistribution d = new NormalDistribution(radioMap.get(AP)[cell][0],radioMap.get(AP)[cell][1]);
-
-//                    pdf[cell] =;
-
-                }
-
-            }
-
-
         }
-
-
-
-        return predict;
+        else if(op.equals("+")){
+            for (int i = 0; i < a1.length; i++){
+                res[i] = a1[i] + a2[i];
+            }
+        }
+        return res;
     }
-}
+
+    public void initialize(){
+        predict = -1;
+        prior = new double[radioMap.keySet().size()][19];
+        for (int i = 0; i<radioMap.keySet().size(); i++) {
+            for (int j = 0; j < 19; j++) {
+                prior[i][j] = 1 / 19;
+            }
+        }
+        post = prior.clone();
+        iteration = 0;
+        proba = 0;
+    }
+
+
+    public Object[] bayes(Map<String, Integer> test_data) {
+        prior = post.clone();
+        j = 0;
+        double[] overall_post = new double[19];
+        for (int i = 0; i < 19; i++) {
+            overall_post[i] = 0;
+        }
+        List<Entry<String, Integer>> sorted_test_data = sortMap(test_data);
+        for (int item = 0; item < 30; item++) {
+            double[] pdf = new double[19];
+            for (int i = 0; i < 19; i++) {
+                pdf[i] = 0;
+            }
+            for (int cell = 0; cell < 19; cell++) {
+                String AP = sorted_test_data.get(item).getKey();
+                NormalDistribution d = new NormalDistribution(radioMap.get(AP)[cell][0], radioMap.get(AP)[cell][1]);
+                pdf[cell] = d.density(normalization((test_data.get(AP))));
+                if (Double.isNaN(pdf[cell])) {
+                    pdf[cell] = 0.0;
+                }
+            }
+            post[j] = matrixOperation(prior[j], pdf, "*");
+            overall_post = matrixOperation(post[j], overall_post, "+");
+            j += 1;
+        }
+        double sum1 = 0;
+        for (int i = 0; i < 19; i++) {
+            sum1 += overall_post[i];
+        }
+        double[] average_overvall_post = new double[19];
+        for (int i = 0; i < 19; i++) {
+            average_overvall_post[i] = average_overvall_post[i] / sum1;
+        }
+        Object[] fdmax = findMax(average_overvall_post);
+//        predict = (int) fdmax[1];
+//        proba = (double) fdmax[0];
+////            i++; //下一组数据
+//        iteration++;
+//        if (iteration > 10) {
+//            return fdmax;
+//        }
+        return fdmax;
+    }
+
+        public Object[] findMax(double[] arr){
+            Object[] res = new Object[2];
+            double max = arr[0];
+            int pred = 0;
+            for (int i=0; i<arr.length; i++){
+                if (max < arr[i]){
+                    max = arr[i];
+                    pred = i;
+                }
+            }
+            res[0] = max;
+            res[1] = pred;
+            return res;
+        }
+
+
+    }
+
+
+

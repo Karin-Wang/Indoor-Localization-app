@@ -37,6 +37,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Bitmap;
 import java.util.Timer;
+import java.util.List;
+import java.util.Arrays;
 
 
 
@@ -46,7 +48,8 @@ import java.util.Timer;
 public class MainActivity extends Activity implements SensorEventListener {
 
     private SensorManager sensorManager;
-
+    private String[] AP_filter1 = {"TUvisitor","tudelft-dastud","eduroam"};
+    private List<String> AP_filter = Arrays.asList(AP_filter1);
 
     private Sensor accelerometer;
     private Sensor linearaccelerometer;
@@ -233,8 +236,31 @@ public class MainActivity extends Activity implements SensorEventListener {
         buttonBayes.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                //int guess = Bayesian.bayes();sdf
-                int guess = 5;
+                Bayesian bayes1 = new Bayesian();
+                bayes1.initialize();
+                bayes1.getRadioMap();
+                int iter = 1;
+                int guess = -1;
+                double proba = 0.0;
+                Object[] temp;
+                Map<String, Integer> wif_data ;
+                while(proba <= 0.9){
+                    wif_data = getWifiData();
+                    temp = bayes1.bayes(wif_data);
+                    guess = (int)temp[1];
+                    proba = (double)temp[0];
+                    if (iter >= 10){
+                        break;
+                    }
+                    else{
+                        iter++;
+                    }
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
                 textbay.setText("Guess: "+String.valueOf(guess));
             }
         });
@@ -488,6 +514,22 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         return maskBitmap;
 
+    }
+
+    public Map<String, Integer> getWifiData(){
+        Map<String, Integer> data = new HashMap<>();
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        // Start a wifi scan
+        Map<String, ArrayList<Integer>> wifiData = new HashMap<>();
+        wifiManager.startScan();
+        // Store results in a list.
+        List<ScanResult> scanResults = wifiManager.getScanResults();
+        for (ScanResult scanResult : scanResults) {
+            if (AP_filter.contains(scanResult.SSID)) {
+                data.put(scanResult.BSSID, scanResult.level);
+            }
+        }
+        return data;
     }
 
 }
