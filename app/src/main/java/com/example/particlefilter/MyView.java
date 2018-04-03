@@ -31,7 +31,8 @@ public class MyView extends View {   // stackoverflow code
     public float y;
     public int radius = 20;
 
-
+    public  static double INITIAL_ANGLE = 2.2;
+    public  static double INITIAL_SPEED = 5;
 
     public MyView(Context context) {
         super(context);
@@ -58,8 +59,8 @@ public class MyView extends View {   // stackoverflow code
         // Load attributes
         paint = new Paint();
         paint.setColor(Color.RED);
-        //populateArrayList();
-        populateParticles();
+        populateArrayList();
+        //populateParticles();
 
     }
 
@@ -68,7 +69,7 @@ public class MyView extends View {   // stackoverflow code
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        //canvas.drawColor(0, PorterDuff.Mode.CLEAR);
 
         //canvas.setBitmap(imageBitmap);
 
@@ -88,9 +89,9 @@ public class MyView extends View {   // stackoverflow code
         particles.clear();
         //particles.add(new Particle(1, 782, 0, 0.2));
         //particles.add(new Particle(200, 400, 0, 0.2));
-        particles.add(new Particle(1000, 400, 0.5, 0.1,0));
-        particles.add(new Particle(1000, 400, 0, 0.4, 0));
-        particles.add(new Particle(1000, 400, -0.5, 0.4, 0));
+        //particles.add(new Particle(1000, 400, 0.5, 0.1,0));
+        //particles.add(new Particle(1000, 400, 0, 0.4, 0));
+        particles.add(new Particle(1642, 456, 0, 0.4, 0));
     }
 
 
@@ -170,8 +171,8 @@ public class MyView extends View {   // stackoverflow code
 
                         Particle curParticle = iterator.next();
 
-                        curParticle.x += (float) (Math.cos(angle + curParticle.angularerror) * (5+curParticle.speederror));
-                        curParticle.y += (float) (Math.sin(angle + curParticle.angularerror) * (5+curParticle.speederror));
+                        curParticle.x += (float) (Math.cos(angle+INITIAL_ANGLE + curParticle.angularerror) * (INITIAL_SPEED + curParticle.speederror));
+                        curParticle.y += (float) (Math.sin(angle+INITIAL_ANGLE + curParticle.angularerror) * (INITIAL_SPEED + curParticle.speederror));
 
                         //Log.d("X: ", String.valueOf(curParticle.x));
                         //Log.d("Y: ", String.valueOf(curParticle.y));
