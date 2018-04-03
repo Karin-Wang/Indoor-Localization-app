@@ -20,10 +20,10 @@ import android.net.wifi.WifiManager;
 
 public class Bayesian {
 
-    private Map<String, float[][]> radioMap;
+    Map<String, float[][]> radioMap;
     private double threshold = 0.9;
     private int maxIter = 10;
-    String filename = "";
+    String filename = "r";
 
     private int predict;
     double[][] prior;
@@ -35,7 +35,7 @@ public class Bayesian {
 
     public void getRadioMap(){
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(filename));//换成你的文件名
+            BufferedReader reader = new BufferedReader(new FileReader(String.valueOf(R.raw.radio_map)));//换成你的文件名
 //            reader.readLine();//第一行信息，为标题信息，不用，如果需要，注释掉
             String line = null;
             while((line=reader.readLine())!=null){
@@ -47,7 +47,7 @@ public class Bayesian {
                     curr[i][0] = Float.parseFloat(item[0]);
                     curr[i][1] = Float.parseFloat(item[1]);
                 }
-                radioMap.put(ap, curr);
+                this.radioMap.put(ap, curr);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,8 +89,8 @@ public class Bayesian {
 
     public void initialize(){
         predict = -1;
-        prior = new double[radioMap.keySet().size()][19];
-        for (int i = 0; i<radioMap.keySet().size(); i++) {
+        prior = new double[this.radioMap.keySet().size()][19];
+        for (int i = 0; i<this.radioMap.keySet().size(); i++) {
             for (int j = 0; j < 19; j++) {
                 prior[i][j] = 1 / 19;
             }
