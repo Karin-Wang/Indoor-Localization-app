@@ -31,7 +31,7 @@ public class MyView extends View {   // stackoverflow code
     public float y;
     public int radius = 20;
 
-
+    public  static double INITIAL_ANGLE = 2.2;
 
     public MyView(Context context) {
         super(context);
@@ -170,8 +170,8 @@ public class MyView extends View {   // stackoverflow code
 
                         Particle curParticle = iterator.next();
 
-                        curParticle.x += (float) (Math.cos(angle + curParticle.angularerror) * (5+curParticle.speederror));
-                        curParticle.y += (float) (Math.sin(angle + curParticle.angularerror) * (5+curParticle.speederror));
+                        curParticle.x += (float) (Math.cos(angle+INITIAL_ANGLE + curParticle.angularerror) * (5+curParticle.speederror));
+                        curParticle.y += (float) (Math.sin(angle+INITIAL_ANGLE + curParticle.angularerror) * (5+curParticle.speederror));
 
                         //Log.d("X: ", String.valueOf(curParticle.x));
                         //Log.d("Y: ", String.valueOf(curParticle.y));
