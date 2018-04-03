@@ -237,8 +237,8 @@ public class MainActivity extends Activity implements SensorEventListener {
             @Override
             public void onClick(View v) {
                 Bayesian bayes1 = new Bayesian();
-                bayes1.initialize();
                 bayes1.getRadioMap();
+                bayes1.initialize();
                 int iter = 1;
                 int guess = -1;
                 double proba = 0.0;
@@ -533,4 +533,5 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
 }
+
 
