@@ -401,8 +401,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         double deviation = 0;
         double mean;
-        double WALK_LIMIT = 0.12;
-        double STEP_LIMIT = 0.08;
+        double WALK_LIMIT = 0.10;
+        double STEP_LIMIT = 0.06;
 
 
         if(samplecounter == windowsize-1) {
@@ -461,7 +461,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         p.setColor(Color.RED);
 
 
-        //floorplan.setBackgroundResource(R.drawable.floorplan_final_3_v3);
         floorplan.setBackgroundResource(R.drawable.floorplan_final_3_v3);
 
         myview = new MyView(getApplicationContext());
