@@ -94,14 +94,14 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     boolean iswalking = false;
 
-    public Bitmap imageBitmap;
+    public static Bitmap imageBitmap;
     public static Bitmap maskBitmap,maskBitmap3,maskBitmap4;
     Canvas canvas;
     Button buttonReset;
 
     private double[] accarray = new double[5];
 
-    public ImageView floorplan;
+    public static ImageView floorplan;
     MyView myview;
 
 
@@ -239,7 +239,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         });
 
-        buttonBayes.setOnClickListener(new OnClickListener() {
+       /* buttonBayes.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 BufferedReader reader = null;
@@ -284,7 +284,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                 Log.d("iter", String.valueOf(iter));
                 textbay.setText("Guess: "+String.valueOf(guess));
             }
-        });
+        });*/
 
         final Handler initHandler = new Handler();  // delay this task, prevent app from crash
         initHandler.postDelayed(new Runnable() {
@@ -461,6 +461,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         p.setColor(Color.RED);
 
 
+        //floorplan.setBackgroundResource(R.drawable.floorplan_final_3_v3);
         floorplan.setBackgroundResource(R.drawable.floorplan_final_3_v3);
 
         myview = new MyView(getApplicationContext());
@@ -476,7 +477,6 @@ public class MainActivity extends Activity implements SensorEventListener {
             public void run() {
                 if(iswalking) {
                     myview.updatePoints(azimuth, canvas);
-                    floorplan.setImageBitmap(imageBitmap);
                 }
                 myHandler.postDelayed(this,200);
             }
@@ -532,10 +532,12 @@ public class MainActivity extends Activity implements SensorEventListener {
             maskBitmap = null;
             maskBitmap = maskBitmap4;
         }
-
         return maskBitmap;
-
     }
+
+    public static ImageView getFloorplan(){return floorplan;}
+    public static Bitmap getImageBitmap(){return imageBitmap;}
+
 
     public Map<String, Integer> getWifiData(Map<String, float[][]> radioMap){
         Map<String, Integer> data = new HashMap<>();

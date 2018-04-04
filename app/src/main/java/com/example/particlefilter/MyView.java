@@ -82,6 +82,7 @@ public class MyView extends View {   // stackoverflow code
             canvas.drawCircle(curParticle.x, curParticle.y, (float)curParticle.weight*radius, paint);
 
         }
+        MainActivity.getFloorplan().setImageBitmap(MainActivity.getImageBitmap());
     }
 
 
@@ -99,7 +100,7 @@ public class MyView extends View {   // stackoverflow code
         particles.clear();
 
         int cntr = 0;
-        int STEP = 35;
+        int STEP = 40;
         Bitmap mask = MainActivity.getMaskBitmap();
 
         double[] speedvector = {-1.5,-0.75,0,0.75,1.5};
@@ -147,8 +148,7 @@ public class MyView extends View {   // stackoverflow code
 
             alive.add(currentDeadParticle);
         }
-
-        particles = alive;
+        particles = (CopyOnWriteArrayList<Particle>) alive.clone();
     }
 
 
@@ -171,6 +171,7 @@ public class MyView extends View {   // stackoverflow code
 
                         Particle curParticle = iterator.next();
 
+
                         curParticle.x += (float) (Math.cos(angle+INITIAL_ANGLE + curParticle.angularerror) * (INITIAL_SPEED + curParticle.speederror));
                         curParticle.y += (float) (Math.sin(angle+INITIAL_ANGLE + curParticle.angularerror) * (INITIAL_SPEED + curParticle.speederror));
 
@@ -178,6 +179,13 @@ public class MyView extends View {   // stackoverflow code
                         //Log.d("Y: ", String.valueOf(curParticle.y));
 
                         Bitmap maskBitmap = MainActivity.getMaskBitmap();
+
+                        if(curParticle.x < 0) curParticle.x = 0;
+                        if(curParticle.y < 0) curParticle.y = 0;
+                        if(curParticle.x > maskBitmap.getWidth()) curParticle.x =  maskBitmap.getWidth();
+                        if(curParticle.y > maskBitmap.getWidth()) curParticle.y =  maskBitmap.getHeight();
+
+
                         int color = maskBitmap.getPixel(((int) curParticle.x) * 3, ((int) (curParticle.y * 3)));
 
 
@@ -195,24 +203,22 @@ public class MyView extends View {   // stackoverflow code
                         }
                         cntr++;
                     }
-                    Log.d("particlebefore: ", String.valueOf(particles.size()));
-                    Log.d("new: ", String.valueOf(aliveParticles.size()));
-                    Log.d("dead: ", String.valueOf(deadParticles.size()));
-                    Log.d("cntr: ", String.valueOf(cntr));
+                    Log.d("particles: ", String.valueOf(particles.size()));
                     resampling(aliveParticles, deadParticles);
-                    Log.d("particleafter: ", String.valueOf(particles.size()));
-                    Log.d("new: ", String.valueOf(aliveParticles.size()));
-                    Log.d("dead: ", String.valueOf(deadParticles.size()));
+
                 }
             }
         };
-        new Thread(runnable).start();
 
-        this.onDraw(canvas);
-
+        Thread update = new Thread(runnable);
+        update.start();
+        try {
+            update.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        onDraw(canvas);
     }
-
-
 }
 
 class Particle{
