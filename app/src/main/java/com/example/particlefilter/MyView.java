@@ -32,7 +32,7 @@ public class MyView extends View {   // stackoverflow code
     public int radius = 20;
 
     public  static double INITIAL_ANGLE = 2.2;
-    public  static double INITIAL_SPEED = 5;
+    public  static double INITIAL_SPEED = 30;
 
     public MyView(Context context) {
         super(context);
@@ -59,8 +59,8 @@ public class MyView extends View {   // stackoverflow code
         // Load attributes
         paint = new Paint();
         paint.setColor(Color.RED);
-        populateArrayList();
-        //populateParticles();
+        //populateArrayList();
+        populateParticles();
 
     }
 
@@ -69,7 +69,7 @@ public class MyView extends View {   // stackoverflow code
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        //canvas.drawColor(0, PorterDuff.Mode.CLEAR);
+        canvas.drawColor(0, PorterDuff.Mode.CLEAR);
 
         //canvas.setBitmap(imageBitmap);
 
@@ -99,11 +99,11 @@ public class MyView extends View {   // stackoverflow code
         particles.clear();
 
         int cntr = 0;
-        int STEP = 20;
+        int STEP = 35;
         Bitmap mask = MainActivity.getMaskBitmap();
 
-        double[] speedvector = {-0.05,0,0.05};
-        double[] anglevector = {-0.05,0,0.05};
+        double[] speedvector = {-1.5,-0.75,0,0.75,1.5};
+        double[] anglevector = {-0.6,-0.3,0,0.3,0.6};
 
         for (int i = 0; i < mask.getWidth()/3;i=i+STEP){
             for (int j = 0; j < mask.getHeight()/3;j=j+STEP){

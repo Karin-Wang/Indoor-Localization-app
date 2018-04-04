@@ -7,12 +7,19 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import android.content.res.Resources;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.util.Log;
+import java.io.InputStreamReader;
+import java.io.InputStream;
+//import android.content;
 
 /**
  * Created by Kaering on 3/30/18.
@@ -20,7 +27,7 @@ import android.net.wifi.WifiManager;
 
 public class Bayesian {
 
-    Map<String, float[][]> radioMap;
+    Map<String, float[][]> radioMap = new HashMap<>();
     private double threshold = 0.9;
     private int maxIter = 10;
     String filename = "r";
@@ -32,10 +39,19 @@ public class Bayesian {
     int j;
     double proba;
 
+//    public Bayesian(){
+//        this.getRadioMap();
+//        this.initialize();
+//    }
 
-    public void getRadioMap(){
+
+    public void getRadioMap(BufferedReader reader){
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(String.valueOf(R.raw.radio_map)));//换成你的文件名
+////            InputStream rawRes = context.getAssets().open("radio.extension");
+//            Resources r = this.getContext().getResources();
+//            InputStream rawRes = getResources().openRawResource(R.raw.radio_map);
+////            Reader r = new BufferedReader(new InputStreamReader(rawRes, "UTF8"));
+//            BufferedReader reader = new BufferedReader(new InputStreamReader(rawRes, "UTF8"));//换成你的文件名
 //            reader.readLine();//第一行信息，为标题信息，不用，如果需要，注释掉
             String line = null;
             while((line=reader.readLine())!=null){
@@ -44,8 +60,15 @@ public class Bayesian {
                 for (int i=0; i<19; i++){
                     line=reader.readLine();
                     String[] item = line.split("，");//CSV格式文件为逗号分隔符文件，这里根据逗号切分
-                    curr[i][0] = Float.parseFloat(item[0]);
-                    curr[i][1] = Float.parseFloat(item[1]);
+//                    Log.d("item", item[0].toString());
+                    String[] a = item[0].split(",");
+
+
+                    curr[i][0] = Float.parseFloat(a[0].substring(1));
+                    curr[i][1] = Float.parseFloat(a[1].substring(0,a[1].length()-1));
+//                    curr[i][0] = Float.parseFloat(item[0]);
+//                    curr[i][1] = Float.parseFloat(item[1]);
+//                    Log.d("1", curr[i].toString());
                 }
                 this.radioMap.put(ap, curr);
             }
@@ -77,6 +100,8 @@ public class Bayesian {
         if (op.equals("*")){
             for (int i = 0; i < a1.length; i++){
                 res[i] = a1[i] * a2[i];
+//                Log.d("pdf", String.valueOf(a2[i]));
+//                Log.d("post", String.valueOf(res[i]));
             }
         }
         else if(op.equals("+")){
@@ -91,9 +116,8 @@ public class Bayesian {
         predict = -1;
         prior = new double[this.radioMap.keySet().size()][19];
         for (int i = 0; i<this.radioMap.keySet().size(); i++) {
-            for (int j = 0; j < 19; j++) {
-                prior[i][j] = 1 / 19;
-            }
+            for (int j = 0; j < 19; j++) prior[i][j] = 1/19.0;
+//            Log.d("priorrrrr", String.valueOf(prior[i][j]));
         }
         post = prior.clone();
         iteration = 0;
@@ -109,40 +133,72 @@ public class Bayesian {
             overall_post[i] = 0;
         }
         List<Entry<String, Integer>> sorted_test_data = sortMap(test_data);
-        for (int item = 0; item < 30; item++) {
+        int sizet = 30;
+        if (test_data.size()<30){
+            sizet = test_data.size();
+        }
+        for (int item = 0; item < sizet; item++) {
             double[] pdf = new double[19];
             for (int i = 0; i < 19; i++) {
                 pdf[i] = 0;
             }
             for (int cell = 0; cell < 19; cell++) {
                 String AP = sorted_test_data.get(item).getKey();
-                NormalDistribution d = new NormalDistribution(radioMap.get(AP)[cell][0], radioMap.get(AP)[cell][1]);
-                pdf[cell] = d.density(normalization((test_data.get(AP))));
-                if (Double.isNaN(pdf[cell])) {
+                if (radioMap.get(AP)[cell][1] == 0.0){
                     pdf[cell] = 0.0;
                 }
+                else {
+                    NormalDistribution d = new NormalDistribution(radioMap.get(AP)[cell][0], radioMap.get(AP)[cell][1]);
+                    pdf[cell] = d.density(normalization((test_data.get(AP))));
+                    if (Double.isNaN(pdf[cell])) {
+                        pdf[cell] = 0.0;
+                    }
+                }
+//                Log.d("proba1", String.valueOf(pdf[cell]));
             }
             post[j] = matrixOperation(prior[j], pdf, "*");
+
             overall_post = matrixOperation(post[j], overall_post, "+");
             j += 1;
         }
         double sum1 = 0;
         for (int i = 0; i < 19; i++) {
             sum1 += overall_post[i];
+//            Log.d("overall", String.valueOf(sum1));
         }
         double[] average_overvall_post = new double[19];
         for (int i = 0; i < 19; i++) {
-            average_overvall_post[i] = average_overvall_post[i] / sum1;
+            average_overvall_post[i] = overall_post[i] / sum1;
+            Log.d("average_overvall_post", String.valueOf(average_overvall_post[i]));
         }
         Object[] fdmax = findMax(average_overvall_post);
-//        predict = (int) fdmax[1];
-//        proba = (double) fdmax[0];
+        predict = (int) fdmax[1];
+        proba = (double) fdmax[0];
 ////            i++; //下一组数据
 //        iteration++;
 //        if (iteration > 10) {
 //            return fdmax;
 //        }
+//        predict = findMax1(average_overvall_post);
+        Log.d("proba", String.valueOf((Double) (fdmax[0])));
+        Log.d("predict", fdmax[1].toString());
+//        return predict;
         return fdmax;
+    }
+
+    public int findMax1(double[] arr){
+        int res = -1;
+        double max = arr[0];
+        int pred = 0;
+        for (int i=0; i<arr.length; i++){
+            if (max < arr[i]){
+                max = arr[i];
+                pred = i;
+            }
+        }
+//        res[0] = max;
+        res = pred+1;
+        return res;
     }
 
         public Object[] findMax(double[] arr){
@@ -156,7 +212,7 @@ public class Bayesian {
                 }
             }
             res[0] = max;
-            res[1] = pred;
+            res[1] = pred+1;
             return res;
         }
 

@@ -24,8 +24,13 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.os.Environment;
+
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -54,6 +59,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private Sensor accelerometer;
     private Sensor linearaccelerometer;
     private Sensor magnetometer;
+    private Map<String, float[][]> radioMap1;
 
 
 
@@ -236,31 +242,46 @@ public class MainActivity extends Activity implements SensorEventListener {
         buttonBayes.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                BufferedReader reader = null;
+                InputStream rawRes = getResources().openRawResource(R.raw.radio_map1);
+                try {
+                    reader = new BufferedReader(new InputStreamReader(rawRes, "UTF8"));//换成你的文件名
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
                 Bayesian bayes1 = new Bayesian();
-                bayes1.getRadioMap();
+                bayes1.getRadioMap(reader);
                 bayes1.initialize();
+                radioMap1 = bayes1.radioMap;
                 int iter = 1;
                 int guess = -1;
                 double proba = 0.0;
                 Object[] temp;
                 Map<String, Integer> wif_data ;
                 while(proba <= 0.9){
-                    wif_data = getWifiData();
+                    wif_data = getWifiData(radioMap1);
                     temp = bayes1.bayes(wif_data);
                     guess = (int)temp[1];
                     proba = (double)temp[0];
-                    if (iter >= 10){
+                    if (iter >= 20){
                         break;
+                    }
+                    else if(iter>=14 && proba<=0.4){
+                        iter = 1;
+                        bayes1.initialize();
+                        proba = 0.0;
+
                     }
                     else{
                         iter++;
                     }
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
+                Log.d("iter", String.valueOf(iter));
                 textbay.setText("Guess: "+String.valueOf(guess));
             }
         });
@@ -380,7 +401,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         double deviation = 0;
         double mean;
-        double WALK_LIMIT = 0.15;
+        double WALK_LIMIT = 0.12;
         double STEP_LIMIT = 0.08;
 
 
@@ -427,8 +448,8 @@ public class MainActivity extends Activity implements SensorEventListener {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 
-        maskBitmap3 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_3_v3 ,options);
-        maskBitmap4 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_4_v3 ,options);
+        maskBitmap3 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_3_v6 ,options);
+        maskBitmap4 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_4_v6 ,options);
 
         maskBitmap = maskBitmap3;
 
@@ -516,7 +537,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     }
 
-    public Map<String, Integer> getWifiData(){
+    public Map<String, Integer> getWifiData(Map<String, float[][]> radioMap){
         Map<String, Integer> data = new HashMap<>();
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         // Start a wifi scan
@@ -525,7 +546,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         // Store results in a list.
         List<ScanResult> scanResults = wifiManager.getScanResults();
         for (ScanResult scanResult : scanResults) {
-            if (AP_filter.contains(scanResult.SSID)) {
+            if (AP_filter.contains(scanResult.SSID) && radioMap.containsKey(scanResult.BSSID)) {
                 data.put(scanResult.BSSID, scanResult.level);
             }
         }
