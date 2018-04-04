@@ -39,7 +39,7 @@
             <Button
                 android:id="@+id/bayes"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Bayes" />
 
@@ -54,8 +54,16 @@
                 android:id="@+id/reset"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="0.99"
                 android:text="Reset PF" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="PF: 18"
+                android:textAlignment="center" />
 
             <TextView
                 android:id="@+id/textSTEPCOUNT"
