@@ -26,6 +26,8 @@ public class MyView extends View {   // stackoverflow code
 
     CopyOnWriteArrayList<Particle> particles = new CopyOnWriteArrayList<>();
 
+    Particle heroParticle;
+
 
     public float x;
     public float y;
@@ -135,6 +137,11 @@ public class MyView extends View {   // stackoverflow code
 
         Random random = new Random();
 
+        if (alive.size() == 0) {
+            alive.add(heroParticle);
+            dead.remove(1);
+        }
+
 
         for (int index = 0; index < dead.size(); index++){
 
@@ -171,19 +178,19 @@ public class MyView extends View {   // stackoverflow code
 
                         Particle curParticle = iterator.next();
 
+                        heroParticle = curParticle;
+
 
                         curParticle.x += (float) (Math.cos(angle+INITIAL_ANGLE + curParticle.angularerror) * (INITIAL_SPEED + curParticle.speederror));
                         curParticle.y += (float) (Math.sin(angle+INITIAL_ANGLE + curParticle.angularerror) * (INITIAL_SPEED + curParticle.speederror));
 
-                        //Log.d("X: ", String.valueOf(curParticle.x));
-                        //Log.d("Y: ", String.valueOf(curParticle.y));
 
                         Bitmap maskBitmap = MainActivity.getMaskBitmap();
 
                         if(curParticle.x < 0) curParticle.x = 0;
                         if(curParticle.y < 0) curParticle.y = 0;
-                        if(curParticle.x > maskBitmap.getWidth()) curParticle.x =  maskBitmap.getWidth();
-                        if(curParticle.y > maskBitmap.getWidth()) curParticle.y =  maskBitmap.getHeight();
+                        if(curParticle.x > maskBitmap.getWidth()) curParticle.x =  maskBitmap.getWidth()-1;
+                        if(curParticle.y > maskBitmap.getWidth()) curParticle.y =  maskBitmap.getHeight()-1;
 
 
                         int color = maskBitmap.getPixel(((int) curParticle.x) * 3, ((int) (curParticle.y * 3)));
