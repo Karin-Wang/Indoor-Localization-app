@@ -548,6 +548,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     public static ImageView getFloorplan(){return floorplan;}
     public static Bitmap getImageBitmap(){return imageBitmap;}
+    public static TextView getPFTextView(){return textzone;}
 
 
 

@@ -34,6 +34,7 @@ public class MyView extends View {   // stackoverflow code
 
 
     Particle heroParticle;
+    int mostPopulated;
 
 
     public float x;
@@ -120,8 +121,7 @@ public class MyView extends View {   // stackoverflow code
         }
 
 
-        int mostPopulated = getMaxIndex(zoneCounter);
-        //MainActivity.getPFTextView().setText("PF: "+String.valueOf(mostPopulated));
+       mostPopulated = getMaxIndex(zoneCounter);
     }
 
     public static int getMaxIndex(int[] inputArray){
@@ -172,6 +172,7 @@ public class MyView extends View {   // stackoverflow code
 
         }
         MainActivity.getFloorplan().setImageBitmap(MainActivity.getImageBitmap());
+        MainActivity.getPFTextView().setText("PF: "+ String.valueOf(mostPopulated));
     }
 
 
@@ -243,7 +244,6 @@ public class MyView extends View {   // stackoverflow code
             alive.add(currentDeadParticle);
         }
         particles = (CopyOnWriteArrayList<Particle>) alive.clone();
-        updateZones();
     }
 
 
@@ -312,6 +312,7 @@ public class MyView extends View {   // stackoverflow code
         } catch (Exception e) {
             e.printStackTrace();
         }
+        updateZones();
         onDraw(canvas);
     }
 }
