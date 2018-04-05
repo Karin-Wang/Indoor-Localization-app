@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,7 @@ public class MyView extends View {   // stackoverflow code
     Paint paint;
 
     CopyOnWriteArrayList<Particle> particles = new CopyOnWriteArrayList<>();
+    ArrayList<Rect> zones = new ArrayList<>();
 
     Particle heroParticle;
 
@@ -41,6 +43,7 @@ public class MyView extends View {   // stackoverflow code
         x = this.getX();
         y = this.getY();
         init();
+        populateRect();
     }
 
     public MyView(Context context, AttributeSet attrs) {
@@ -63,6 +66,31 @@ public class MyView extends View {   // stackoverflow code
         paint.setColor(Color.RED);
         //populateArrayList();
         populateParticles();
+
+    }
+
+    private void populateRect() {
+
+        zones.add(new Rect(528, 308, 751, 398)); // 1
+        zones.add(new Rect(528, 403, 751, 516)); // 2
+        zones.add(new Rect(751, 403, 1003, 516)); // 3
+        zones.add(new Rect(1003, 403, 1178, 1464)); // 4
+        zones.add(new Rect(1003, 516, 1178, 1087)); // 5
+        zones.add(new Rect(1178, 403, 1464, 516)); // 6
+        zones.add(new Rect(1178, 516, 1352, 781)); // 7
+        zones.add(new Rect(1467, 486, 1650, 672)); // 8
+        zones.add(new Rect(1650, 489, 1870, 607)); // 9
+        zones.add(new Rect(1465, 300, 1650, 485)); // 10
+        zones.add(new Rect(1465, 112, 1532, 300)); // 11
+        zones.add(new Rect(1242, 44, 1532, 110)); // 12
+        zones.add(new Rect(1048, 44, 1242, 180)); // 13
+        zones.add(new Rect(824, 44, 1084, 180)); // 14
+        zones.add(new Rect(528, 44, 824, 208)); // 15
+        zones.add(new Rect(1051, 183, 1168, 400)); // 16
+        zones.add(new Rect(1051, 184, 1171, 400)); // 17
+        zones.add(new Rect(529, 232, 622, 398)); // 18
+        zones.add(new Rect(1534, 46, 1872, 300)); // 19
+
 
     }
 
@@ -178,7 +206,7 @@ public class MyView extends View {   // stackoverflow code
 
                         Particle curParticle = iterator.next();
 
-                        heroParticle = curParticle;
+                        heroParticle = curParticle; // the particle that saves us from indexOutOfBounds error
 
 
                         curParticle.x += (float) (Math.cos(angle+INITIAL_ANGLE + curParticle.angularerror) * (INITIAL_SPEED + curParticle.speederror));
