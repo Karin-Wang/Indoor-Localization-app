@@ -13,6 +13,8 @@ import android.util.Log;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Random;
@@ -26,7 +28,10 @@ public class MyView extends View {   // stackoverflow code
     Paint paint;
 
     CopyOnWriteArrayList<Particle> particles = new CopyOnWriteArrayList<>();
+
     ArrayList<Rect> zones = new ArrayList<>();
+    int[] zoneCounter;
+
 
     Particle heroParticle;
 
@@ -43,7 +48,6 @@ public class MyView extends View {   // stackoverflow code
         x = this.getX();
         y = this.getY();
         init();
-        populateRect();
     }
 
     public MyView(Context context, AttributeSet attrs) {
@@ -66,6 +70,7 @@ public class MyView extends View {   // stackoverflow code
         paint.setColor(Color.RED);
         //populateArrayList();
         populateParticles();
+        populateRect();
 
     }
 
@@ -93,6 +98,60 @@ public class MyView extends View {   // stackoverflow code
 
 
     }
+
+    private void updateZones(){
+
+        zoneCounter = new int[19];
+        Iterator<Particle> zoneiterator = particles.iterator();
+
+        while (zoneiterator.hasNext()) {
+
+            Particle zoneParticle = zoneiterator.next();
+
+            for (int index = 0; index < 19; index++){
+
+                if (zones.get(index).contains((int)zoneParticle.x, (int)zoneParticle.y)){
+
+                    zoneCounter[index]++;
+                    break;
+
+                }
+            }
+        }
+
+
+        int mostPopulated = getMaxIndex(zoneCounter);
+        //MainActivity.getPFTextView().setText("PF: "+String.valueOf(mostPopulated));
+    }
+
+    public static int getMaxIndex(int[] inputArray){
+        int maxValue = inputArray[0];
+        int maxIndex = 0;
+
+        int floor = MainActivity.getFloor();
+
+        if (floor == 3){
+
+            for(int i=16;i < 19;i++){
+                if(inputArray[i] > maxValue){
+                    maxValue = inputArray[i];
+                    maxIndex = i+1;
+                }
+            }
+
+        } else {
+            for(int i=0; i < 16;i++){
+                if(inputArray[i] > maxValue){
+                    maxValue = inputArray[i];
+                    maxIndex = i+1;
+                }
+            }
+        }
+
+        Log.d("maxindex: ", String.valueOf(maxIndex));
+        return maxIndex;
+    }
+
 
 
     @Override
@@ -184,6 +243,7 @@ public class MyView extends View {   // stackoverflow code
             alive.add(currentDeadParticle);
         }
         particles = (CopyOnWriteArrayList<Particle>) alive.clone();
+        updateZones();
     }
 
 

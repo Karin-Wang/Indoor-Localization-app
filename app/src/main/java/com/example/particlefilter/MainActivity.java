@@ -67,7 +67,6 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 
     private TextView textstep,textaz,textbay;
-
     Button buttonAccRecord;
     private boolean isRecord = false;
     private double accmagnitude;
@@ -103,6 +102,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     public static ImageView floorplan;
     MyView myview;
+    public static TextView textzone;
 
 
 
@@ -118,6 +118,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         textstep = (TextView) findViewById(R.id.textSTEPCOUNT);
         textaz = (TextView) findViewById(R.id.textROTAZ);
         textbay = (TextView) findViewById(R.id.textBAYESIAN);
+        textzone = (TextView) findViewById(R.id.textZone);
 
         // create buttons
         //buttonAccRecord = (Button) findViewById(R.id.recordAcc);
@@ -502,9 +503,6 @@ public class MainActivity extends Activity implements SensorEventListener {
             floorplan.setImageBitmap(imageBitmap);
 
         }
-
-
-
     }
 
     public void resetInitialBelief() {
@@ -534,8 +532,23 @@ public class MainActivity extends Activity implements SensorEventListener {
         return maskBitmap;
     }
 
+    public static int getFloor(){
+
+        int floornum = 3;
+
+        if (floor == 3) {
+            floornum = 3;
+        }
+
+        if (floor == 4) {
+            floornum = 4;
+        }
+        return floornum;
+    }
+
     public static ImageView getFloorplan(){return floorplan;}
     public static Bitmap getImageBitmap(){return imageBitmap;}
+
 
 
     public Map<String, Integer> getWifiData(Map<String, float[][]> radioMap){
