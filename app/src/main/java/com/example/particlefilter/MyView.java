@@ -28,13 +28,18 @@ public class MyView extends View {   // stackoverflow code
     Paint paint;
 
     CopyOnWriteArrayList<Particle> particles = new CopyOnWriteArrayList<>();
+    CopyOnWriteArrayList<Particle> aliveParticles;
+    CopyOnWriteArrayList<Particle> deadParticles;
 
     ArrayList<Rect> zones = new ArrayList<>();
     int[] zoneCounter;
 
+    int aliveSize;
+
 
     Particle heroParticle;
-    int mostPopulated;
+    int[] mostPopulated = new int[2];
+    int zoneColor;
 
 
     public float x;
@@ -121,10 +126,19 @@ public class MyView extends View {   // stackoverflow code
         }
 
 
-       mostPopulated = getMaxIndex(zoneCounter);
+       mostPopulated = getMax(zoneCounter);
+
+        float ratio = (float)mostPopulated[1]/(float)particles.size();
+        Log.d("ratio: ", String.valueOf(ratio));
+
+        if (ratio > 0.7){
+            zoneColor = Color.GREEN;
+        } else {
+            zoneColor = Color.CYAN;
+        }
     }
 
-    public static int getMaxIndex(int[] inputArray){
+    public static int[] getMax(int[] inputArray){
         int maxValue = inputArray[0];
         int maxIndex = 0;
 
@@ -148,8 +162,8 @@ public class MyView extends View {   // stackoverflow code
             }
         }
 
-        Log.d("maxindex: ", String.valueOf(maxIndex));
-        return maxIndex;
+        int[] max = {maxIndex,maxValue};
+        return max;
     }
 
 
@@ -172,7 +186,14 @@ public class MyView extends View {   // stackoverflow code
 
         }
         MainActivity.getFloorplan().setImageBitmap(MainActivity.getImageBitmap());
-        MainActivity.getPFTextView().setText("PF: "+ String.valueOf(mostPopulated));
+        if (mostPopulated[0] > 0)  {
+            MainActivity.getPFTextView().setText("PF: "+ String.valueOf(mostPopulated[0]));
+            MainActivity.getPFTextView().setTextColor(zoneColor);
+        } else {
+            MainActivity.getPFTextView().setText("PF: -");
+            MainActivity.getPFTextView().setTextColor(Color.BLACK);
+        }
+
     }
 
 
@@ -225,6 +246,8 @@ public class MyView extends View {   // stackoverflow code
 
         Random random = new Random();
 
+        aliveSize = aliveParticles.size();
+
         if (alive.size() == 0) {
             alive.add(heroParticle);
             dead.remove(1);
@@ -257,8 +280,8 @@ public class MyView extends View {   // stackoverflow code
 
                 Iterator<Particle> iterator = particles.iterator();
                 int cntr = 0;
-                CopyOnWriteArrayList<Particle> aliveParticles = new CopyOnWriteArrayList<>();
-                CopyOnWriteArrayList<Particle> deadParticles = new CopyOnWriteArrayList<>();
+                aliveParticles = new CopyOnWriteArrayList<>();
+                deadParticles = new CopyOnWriteArrayList<>();
 
                 synchronized (this) {
 
@@ -275,10 +298,10 @@ public class MyView extends View {   // stackoverflow code
 
                         Bitmap maskBitmap = MainActivity.getMaskBitmap();
 
-                        if(curParticle.x < 0) curParticle.x = 0;
-                        if(curParticle.y < 0) curParticle.y = 0;
-                        if(curParticle.x > maskBitmap.getWidth()) curParticle.x =  maskBitmap.getWidth()-1;
-                        if(curParticle.y > maskBitmap.getWidth()) curParticle.y =  maskBitmap.getHeight()-1;
+                        if(curParticle.x < 0) curParticle.x = 128;
+                        if(curParticle.y < 0) curParticle.y = 45;
+                        if(curParticle.x > maskBitmap.getWidth()) curParticle.x =  maskBitmap.getWidth()-25;
+                        if(curParticle.y > maskBitmap.getWidth()) curParticle.y =  maskBitmap.getHeight()-20;
 
 
                         int color = maskBitmap.getPixel(((int) curParticle.x) * 3, ((int) (curParticle.y * 3)));
