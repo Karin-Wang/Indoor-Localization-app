@@ -191,29 +191,20 @@ public class MainActivity extends Activity implements SensorEventListener {
         /*buttonAccRecord.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 String fileNameAcc;
-
-
                 if (!isRecord) {
                     isRecord = true;
                     buttonAccRecord.setText("STOP RECORD");
-
-
                 } else {
                     isRecord = false;
-
                     buttonAccRecord.setText("START RECORD");
                     String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()); // time at first call
                     fileNameAcc = "accData_" + curTime + ".csv";
-
                     String row ="Acceleration Y, Accelearion Z, timestamp\n";   // write header to csv file
-
                     try {
                         File sdCard = Environment.getExternalStorageDirectory();
                         File dir = new File(sdCard.getAbsolutePath() + "/localization");
                         dir.mkdir();
-
                         File file = new File(dir, fileNameAcc);
                         FileOutputStream f = new FileOutputStream(file,true);
                         f.write(row.getBytes());
@@ -569,5 +560,3 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
 }
-
-
