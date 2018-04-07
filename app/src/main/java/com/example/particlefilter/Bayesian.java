@@ -28,6 +28,13 @@ import java.io.InputStream;
 public class Bayesian {
 
     Map<String, float[][]> radioMap = new HashMap<>();
+
+    Map<String, float[][]> radioMapN = radioMap; // TODO change to actual radiomaps
+    Map<String, float[][]> radioMapE = radioMap;
+    Map<String, float[][]> radioMapS = radioMap;
+    Map<String, float[][]> radioMapW = radioMap;
+
+
     private double threshold = 0.9;
     private int maxIter = 10;
     String filename = "r";
@@ -215,6 +222,34 @@ public class Bayesian {
             res[1] = pred+1;
             return res;
         }
+
+    public void chooseRadioMap(double angle){
+
+        // double initialAngle = MyView.getInitialAngle();
+
+        double Q1 = -1.41; // value at pi/8
+        double Q2 = 0.15; // value at 3/pi*8
+        double Q3 = 1.72; // value at 5*pi/8
+
+        if (angle > -Math.PI && angle < Q1){
+            radioMap = radioMapN;
+            Log.d("North", "asd");
+        } else if (angle > Q1 && angle < Q2){
+            radioMap = radioMapE;
+            Log.d("East", "asd");
+        } else if (angle > Q2 && angle < Q3){
+            radioMap = radioMapS;
+            Log.d("South", "asd");
+        } else if (angle > Q3 && angle < Math.PI){
+            radioMap = radioMapW;
+            Log.d("West", "asd");
+        }
+
+
+
+
+
+    }
 
 
     }

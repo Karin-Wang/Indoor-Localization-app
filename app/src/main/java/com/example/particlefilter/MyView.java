@@ -129,7 +129,7 @@ public class MyView extends View {   // stackoverflow code
        mostPopulated = getMax(zoneCounter);
 
         float ratio = (float)mostPopulated[1]/(float)particles.size();
-        Log.d("ratio: ", String.valueOf(ratio));
+        //og.d("ratio: ", String.valueOf(ratio));
         double THRESHOLD;
 
         if(MainActivity.getFloor()== 3) THRESHOLD  = 0.4;
@@ -154,7 +154,7 @@ public class MyView extends View {   // stackoverflow code
                 if(inputArray[i] > maxValue){
                     maxValue = inputArray[i];
                     maxIndex = i+1;
-                    Log.d("index: ",String.valueOf(maxIndex)+" , value: "+String.valueOf(maxValue));
+                    //Log.d("index: ",String.valueOf(maxIndex)+" , value: "+String.valueOf(maxValue));
                 }
             }
 
@@ -163,7 +163,7 @@ public class MyView extends View {   // stackoverflow code
                 if(inputArray[i] > maxValue){
                     maxValue = inputArray[i];
                     maxIndex = i+1;
-                    Log.d("index: ",String.valueOf(maxIndex)+" , value: "+String.valueOf(maxValue));
+                    //Log.d("index: ",String.valueOf(maxIndex)+" , value: "+String.valueOf(maxValue));
                 }
             }
         }
@@ -239,7 +239,7 @@ public class MyView extends View {   // stackoverflow code
                         for (int angle = 0; angle < anglevector.length; angle++){
 
                             particles.add(new Particle(i, j, anglevector[angle], 0.1, speedvector[speed]));
-                            Log.d("add "," index: "+cntr+" x: "+String.valueOf(i)+" y "+String.valueOf(j)+" angleerr: "+ String.valueOf(anglevector[angle])+" speederr: "+String.valueOf(speedvector[speed]));
+                            //Log.d("add "," index: "+cntr+" x: "+String.valueOf(i)+" y "+String.valueOf(j)+" angleerr: "+ String.valueOf(anglevector[angle])+" speederr: "+String.valueOf(speedvector[speed]));
                             cntr++;
 
                         }
@@ -329,7 +329,7 @@ public class MyView extends View {   // stackoverflow code
                         }
                         cntr++;
                     }
-                    Log.d("particles: ", String.valueOf(particles.size()));
+                    //Log.d("particles: ", String.valueOf(particles.size()));
                     resampling(aliveParticles, deadParticles);
 
                 }

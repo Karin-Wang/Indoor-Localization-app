@@ -242,6 +242,10 @@ public class MainActivity extends Activity implements SensorEventListener {
                     e.printStackTrace();
                 }
                 Bayesian bayes1 = new Bayesian();
+
+                bayes1.chooseRadioMap(azimuth); // this is new
+
+                
                 bayes1.getRadioMap(reader);
                 bayes1.initialize();
                 radioMap1 = bayes1.radioMap;
