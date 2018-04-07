@@ -85,8 +85,8 @@ public class MyView extends View {   // stackoverflow code
         zones.add(new Rect(528, 308, 751, 398)); // 1
         zones.add(new Rect(528, 403, 751, 516)); // 2
         zones.add(new Rect(751, 403, 1003, 516)); // 3
-        zones.add(new Rect(1003, 403, 1178, 1464)); // 4
-        zones.add(new Rect(1003, 516, 1178, 1087)); // 5
+        zones.add(new Rect(1003, 403, 1178, 518)); // 4
+        zones.add(new Rect(1003, 516, 1178, 780)); // 5
         zones.add(new Rect(1178, 403, 1464, 516)); // 6
         zones.add(new Rect(1178, 516, 1352, 781)); // 7
         zones.add(new Rect(1467, 486, 1650, 672)); // 8
@@ -99,7 +99,7 @@ public class MyView extends View {   // stackoverflow code
         zones.add(new Rect(528, 44, 824, 208)); // 15
         zones.add(new Rect(1051, 183, 1168, 400)); // 16
         zones.add(new Rect(1051, 184, 1171, 400)); // 17
-        zones.add(new Rect(529, 232, 622, 398)); // 18
+        zones.add(new Rect(529, 232, 622, 400)); // 18
         zones.add(new Rect(1534, 46, 1872, 300)); // 19
 
 
@@ -119,7 +119,7 @@ public class MyView extends View {   // stackoverflow code
                 if (zones.get(index).contains((int)zoneParticle.x, (int)zoneParticle.y)){
 
                     zoneCounter[index]++;
-                    break;
+                    //break;
 
                 }
             }
@@ -130,8 +130,12 @@ public class MyView extends View {   // stackoverflow code
 
         float ratio = (float)mostPopulated[1]/(float)particles.size();
         Log.d("ratio: ", String.valueOf(ratio));
+        double THRESHOLD;
 
-        if (ratio > 0.7){
+        if(MainActivity.getFloor()== 3) THRESHOLD  = 0.4;
+        else THRESHOLD = 0.7;
+
+        if (ratio > THRESHOLD){
             zoneColor = Color.GREEN;
         } else {
             zoneColor = Color.CYAN;
@@ -139,8 +143,8 @@ public class MyView extends View {   // stackoverflow code
     }
 
     public static int[] getMax(int[] inputArray){
-        int maxValue = inputArray[0];
-        int maxIndex = 0;
+        int maxValue = 0;
+        int maxIndex = -1;
 
         int floor = MainActivity.getFloor();
 
@@ -150,6 +154,7 @@ public class MyView extends View {   // stackoverflow code
                 if(inputArray[i] > maxValue){
                     maxValue = inputArray[i];
                     maxIndex = i+1;
+                    Log.d("index: ",String.valueOf(maxIndex)+" , value: "+String.valueOf(maxValue));
                 }
             }
 
@@ -158,6 +163,7 @@ public class MyView extends View {   // stackoverflow code
                 if(inputArray[i] > maxValue){
                     maxValue = inputArray[i];
                     maxIndex = i+1;
+                    Log.d("index: ",String.valueOf(maxIndex)+" , value: "+String.valueOf(maxValue));
                 }
             }
         }
@@ -175,6 +181,7 @@ public class MyView extends View {   // stackoverflow code
         canvas.drawColor(0, PorterDuff.Mode.CLEAR);
 
         //canvas.setBitmap(imageBitmap);
+        //canvas.drawRect(zones.get(16),paint);
 
         Iterator<Particle> drawiterator = particles.iterator();
 
@@ -186,7 +193,8 @@ public class MyView extends View {   // stackoverflow code
 
         }
         MainActivity.getFloorplan().setImageBitmap(MainActivity.getImageBitmap());
-        if (mostPopulated[0] > 0)  {
+
+        if (mostPopulated[0] > -1)  {
             MainActivity.getPFTextView().setText("PF: "+ String.valueOf(mostPopulated[0]));
             MainActivity.getPFTextView().setTextColor(zoneColor);
         } else {
@@ -312,8 +320,6 @@ public class MyView extends View {   // stackoverflow code
                         //Log.d("R: ", String.valueOf(redcomponent));
                         if (redcomponent < 255) {
 
-                            // TODO do stuff here
-//
                             deadParticles.add(curParticle);
                         }
                         else{
