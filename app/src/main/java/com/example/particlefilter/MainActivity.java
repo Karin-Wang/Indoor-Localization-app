@@ -240,7 +240,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         });
 
-       /* buttonBayes.setOnClickListener(new OnClickListener() {
+       buttonBayes.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 BufferedReader reader = null;
@@ -285,7 +285,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                 Log.d("iter", String.valueOf(iter));
                 textbay.setText("Guess: "+String.valueOf(guess));
             }
-        });*/
+        });
 
         final Handler initHandler = new Handler();  // delay this task, prevent app from crash
         initHandler.postDelayed(new Runnable() {
