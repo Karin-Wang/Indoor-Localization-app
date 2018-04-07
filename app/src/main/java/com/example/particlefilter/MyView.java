@@ -214,6 +214,8 @@ public class MyView extends View {   // stackoverflow code
         particles.add(new Particle(1642, 456, 0, 0.4, 0));
     }
 
+    public static double getInitialAngle(){ return INITIAL_ANGLE;}
+
 
     public int populateParticles(){
         particles.clear();
