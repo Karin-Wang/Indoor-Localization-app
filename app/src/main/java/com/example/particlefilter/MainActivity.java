@@ -88,6 +88,10 @@ public class MainActivity extends Activity implements SensorEventListener {
     public double azimuth;
 
 
+    public int bayesianSize = 5;
+    public int[] bayesians = new int[bayesianSize];
+    public int bayesiansamplecounter;
+
     private int samplecounter = 0;
     private double sum = 0;
 
@@ -245,7 +249,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
                 bayes1.chooseRadioMap(azimuth); // this is new
 
-                
+
                 bayes1.getRadioMap(reader);
                 bayes1.initialize();
                 radioMap1 = bayes1.radioMap;
@@ -279,6 +283,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                 }
                 Log.d("iter", String.valueOf(iter));
                 textbay.setText("Guess: "+String.valueOf(guess));
+                textbay.setTextColor(Color.BLACK);
             }
         });
 
@@ -464,6 +469,99 @@ public class MainActivity extends Activity implements SensorEventListener {
         myview.onDraw(canvas);
 
         floorplan.setImageBitmap(imageBitmap);
+
+
+        final Handler continuousBayesian = new Handler();  // set a handler for updating the points in every "delaymilis" time period, code from stackoverflow
+        continuousBayesian.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+                BufferedReader reader = null;
+                InputStream rawRes = getResources().openRawResource(R.raw.radio_map1);
+                try {
+                    reader = new BufferedReader(new InputStreamReader(rawRes, "UTF8"));//换成你的文件名
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                Bayesian bayes1 = new Bayesian();
+
+                bayes1.chooseRadioMap(azimuth); // this is new
+
+
+                bayes1.getRadioMap(reader);
+                bayes1.initialize();
+                radioMap1 = bayes1.radioMap;
+                int iter = 1;
+                int guess = -1;
+                double proba = 0.0;
+                Object[] temp;
+                Map<String, Integer> wif_data ;
+                while(proba <= 0.9){
+                    wif_data = getWifiData(radioMap1);
+                    temp = bayes1.bayes(wif_data);
+                    guess = (int)temp[1];
+                    proba = (double)temp[0];
+                    if (iter >= 20){
+                        break;
+                    }
+                    else if(iter>=14 && proba<=0.4){
+                        iter = 1;
+                        bayes1.initialize();
+                        proba = 0.0;
+
+                    }
+                    else{
+                        iter++;
+                    }
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Log.d("iter", String.valueOf(iter));
+                textbay.setText("Guess: "+String.valueOf(guess));
+                textbay.setTextColor(Color.RED);
+
+
+
+                if(bayesiansamplecounter == bayesianSize) {
+                    // do  stuff
+
+                    int threecounter = 0;
+                    int fourconuter = 0;
+
+                    for (int i=0; i<bayesianSize; i++) {
+                        if(bayesians[i] == 17 || bayesians[i] == 19 || bayesians[i] == 19) threecounter++;
+                        else fourconuter++;
+                    }
+
+                    if(threecounter > fourconuter) {
+                        floor = 4;
+                        changeFloor();
+                    }
+                    else {
+                        floor = 3;
+                        changeFloor();
+                    }
+
+                    bayesiansamplecounter = 0;
+
+
+                }
+                else {
+                    bayesians[bayesiansamplecounter] = guess;
+
+                    bayesiansamplecounter++;
+                }
+
+
+
+
+                continuousBayesian.postDelayed(this,1000);
+            }
+        }, 0);  //the time is in miliseconds
+
 
 
         final Handler myHandler = new Handler();  // set a handler for updating the points in every "delaymilis" time period, code from stackoverflow

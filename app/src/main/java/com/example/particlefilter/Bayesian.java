@@ -233,26 +233,18 @@ public class Bayesian {
 
         if (angle > -Math.PI && angle < Q1){
             radioMap = radioMapN;
-            Log.d("North", "asd");
+            Log.d("North", "");
         } else if (angle > Q1 && angle < Q2){
             radioMap = radioMapE;
-            Log.d("East", "asd");
+            Log.d("East", "");
         } else if (angle > Q2 && angle < Q3){
             radioMap = radioMapS;
-            Log.d("South", "asd");
-        } else if (angle > Q3 && angle < Math.PI){
-            radioMap = radioMapW;
-            Log.d("West", "asd");
+            Log.d("South", "");
         }
 
-
-
-
-
     }
 
-
-    }
+}
 
 
 

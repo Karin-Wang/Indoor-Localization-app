@@ -46,8 +46,8 @@ public class MyView extends View {   // stackoverflow code
     public float y;
     public int radius = 20;
 
-    public  static double INITIAL_ANGLE = 2.2;
-    public  static double INITIAL_SPEED = 30;
+    public  static double INITIAL_ANGLE = 1.8;
+    public  static double INITIAL_SPEED = 40;
 
     public MyView(Context context) {
         super(context);
