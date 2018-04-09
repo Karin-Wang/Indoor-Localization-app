@@ -47,7 +47,7 @@ public class MyView extends View {   // stackoverflow code
     public int radius = 20;
 
     public  static double INITIAL_ANGLE = 1.8;
-    public  static double INITIAL_SPEED = 40;
+    public  static double INITIAL_SPEED = 50;
 
     public MyView(Context context) {
         super(context);
@@ -221,11 +221,11 @@ public class MyView extends View {   // stackoverflow code
         particles.clear();
 
         int cntr = 0;
-        int STEP = 40;
+        int STEP = 50;
         Bitmap mask = MainActivity.getMaskBitmap();
 
-        double[] speedvector = {-1.5,-0.75,0,0.75,1.5};
-        double[] anglevector = {-0.6,-0.3,0,0.3,0.6};
+        double[] speedvector = {-2,-0.75,0,0.75,2};
+        double[] anglevector = {-0.4,-0.25,0,0.25,0.4};
 
         for (int i = 0; i < mask.getWidth()/3;i=i+STEP){
             for (int j = 0; j < mask.getHeight()/3;j=j+STEP){
@@ -309,12 +309,21 @@ public class MyView extends View {   // stackoverflow code
                         Bitmap maskBitmap = MainActivity.getMaskBitmap();
 
                         if(curParticle.x < 0) curParticle.x = 128;
-                        if(curParticle.y < 0) curParticle.y = 45;
-                        if(curParticle.x > maskBitmap.getWidth()) curParticle.x =  maskBitmap.getWidth()-25;
-                        if(curParticle.y > maskBitmap.getWidth()) curParticle.y =  maskBitmap.getHeight()-20;
+                        if(curParticle.y < 0) curParticle.y = 60;
+                        if(curParticle.x > maskBitmap.getWidth()) curParticle.x =  maskBitmap.getWidth()-65;
+                        if(curParticle.y > maskBitmap.getHeight()) curParticle.y =  maskBitmap.getHeight()-65;
 
+                        Log.d("particle:", String.valueOf(curParticle.x));
 
-                        int color = maskBitmap.getPixel(((int) curParticle.x) * 3, ((int) (curParticle.y * 3)));
+                        int color = 0;
+
+                        try {
+                            color = maskBitmap.getPixel(((int) curParticle.x) * 3, ((int) (curParticle.y * 3)));
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
 
 
                         int redcomponent = (color >> 16) & 0xff;
