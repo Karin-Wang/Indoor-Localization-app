@@ -23,8 +23,9 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import java.util.Arrays;
 import android.os.Environment;
-
+import org.apache.commons.lang3.ArrayUtils;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.File;
@@ -44,6 +45,7 @@ import android.graphics.Bitmap;
 import java.util.Timer;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Collections;
 
 
 
@@ -55,6 +57,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private SensorManager sensorManager;
     private String[] AP_filter1 = {"TUvisitor","tudelft-dastud","eduroam"};
     private List<String> AP_filter = Arrays.asList(AP_filter1);
+//    private int floorTestsNum = 0;
 
     private Sensor accelerometer;
     private Sensor linearaccelerometer;
@@ -66,15 +69,15 @@ public class MainActivity extends Activity implements SensorEventListener {
     private WifiManager wifiManager;
 
 
-    private TextView textstep,textaz,textbay;
+    private TextView textstep,textaz,textbay, textbayD;
     Button buttonAccRecord;
     private boolean isRecord = false;
     private double accmagnitude;
     private long timestamp;
     String fileNameAcc;
 
-    Button buttonToggleFloor, buttonBayes;
-    public static int floor = 3;
+    Button buttonToggleFloor, buttonBayes, buttonBayesWithDirection;
+    public static int floor = 4;
 
 
 
@@ -88,9 +91,9 @@ public class MainActivity extends Activity implements SensorEventListener {
     public double azimuth;
 
 
-    public int bayesianSize = 5;
+    public int bayesianSize = 3;
     public int[] bayesians = new int[bayesianSize];
-    public int bayesiansamplecounter;
+    public int bayesiansamplecounter = 0;
 
     private int samplecounter = 0;
     private double sum = 0;
@@ -113,6 +116,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 
 
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,6 +127,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         textstep = (TextView) findViewById(R.id.textSTEPCOUNT);
         textaz = (TextView) findViewById(R.id.textROTAZ);
         textbay = (TextView) findViewById(R.id.textBAYESIAN);
+        textbayD = (TextView) findViewById(R.id.textBayesD);
         textzone = (TextView) findViewById(R.id.textZone);
 
         // create buttons
@@ -131,6 +137,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         buttonReset = (Button) findViewById(R.id.reset);
         buttonToggleFloor = (Button) findViewById(R.id.toggleFloor);
         buttonBayes = (Button) findViewById(R.id.bayes);
+        buttonBayesWithDirection = (Button) findViewById(R.id.Bayesd);
 
 
         // Set the sensor manager
@@ -235,11 +242,25 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         });
 
-        buttonBayes.setOnClickListener(new OnClickListener() {
+
+        buttonBayesWithDirection.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                String direction = getDirection(azimuth); // this is new
                 BufferedReader reader = null;
-                InputStream rawRes = getResources().openRawResource(R.raw.radio_map1);
+                InputStream rawRes;
+                if (direction=="North"){
+                    rawRes = getResources().openRawResource(R.raw.radio_map_north);
+                }
+                else if (direction=="South"){
+                    rawRes = getResources().openRawResource(R.raw.radio_map_south);
+                }
+                else if(direction=="West"){
+                    rawRes = getResources().openRawResource(R.raw.radio_map_west);
+                }
+                else{
+                    rawRes = getResources().openRawResource(R.raw.radio_map_east);
+                }
                 try {
                     reader = new BufferedReader(new InputStreamReader(rawRes, "UTF8"));//换成你的文件名
                 } catch (UnsupportedEncodingException e) {
@@ -247,7 +268,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                 }
                 Bayesian bayes1 = new Bayesian();
 
-                bayes1.chooseRadioMap(azimuth); // this is new
+
 
 
                 bayes1.getRadioMap(reader);
@@ -282,10 +303,75 @@ public class MainActivity extends Activity implements SensorEventListener {
                     }
                 }
                 Log.d("iter", String.valueOf(iter));
-                textbay.setText("Guess: "+String.valueOf(guess));
-                textbay.setTextColor(Color.BLACK);
+                textbayD.setText("G: "+String.valueOf(guess)+"-D:"+direction);
+                textbayD.setTextColor(Color.BLACK);
             }
         });
+
+//        buttonBayes.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Map<String, float[][]>[] radioMap_All;
+//                BufferedReader[] reader = new BufferedReader[4];
+//                InputStream rawResN = getResources().openRawResource(R.raw.radio_map_N);
+//                InputStream rawResS = getResources().openRawResource(R.raw.radio_map_S);
+//                InputStream rawResW = getResources().openRawResource(R.raw.radio_map_W);
+//                InputStream rawResE = getResources().openRawResource(R.raw.radio_map_E);
+//                try {
+//                    reader[0] = new BufferedReader(new InputStreamReader(rawResN, "UTF8"));
+//                    reader[1] = new BufferedReader(new InputStreamReader(rawResS, "UTF8"));
+//                    reader[2] = new BufferedReader(new InputStreamReader(rawResW, "UTF8"));
+//                    reader[3] = new BufferedReader(new InputStreamReader(rawResE, "UTF8"));
+//
+//                } catch (UnsupportedEncodingException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                Bayesian bayes1 = new Bayesian();
+//                bayes1.getAllRadioMap(reader);
+//                bayes1.initialize();
+//                radioMap_All = bayes1.radioMap_All;
+//                int iter = 1;
+//                int guess = -1;
+//                double[] proba = {0.0,0.0,0.0,0.0};
+//                double highest_proba = 0.0;
+//                Object[] temp;
+//                Map<String, Integer> wif_data ;
+//                while(highest_proba <= 0.9){
+//                    wif_data = getWifiDataNew(radioMap_All);
+//                    temp = bayes1.bayes_new(wif_data);
+//                    guess = (int)temp[1];
+//                    proba = (double[])temp[0];
+//                    List pb = Arrays.asList(ArrayUtils.toObject(proba));
+//                    highest_proba = (double) Collections.min(pb);
+//                    if (iter >= 20){
+//                        break;
+//                    }
+//                    else if(iter>=14 && highest_proba<=0.4){
+//                        iter = 1;
+//                        bayes1.initialize();
+//                        proba[0] = 0.0;
+//                        proba[0] = 0.0;
+//                        proba[0] = 0.0;
+//                        proba[0] = 0.0;
+//
+//
+//                                0.0, 0.0, 0.0, 0.0};
+//                    }
+//                    else{
+//                        iter++;
+//                    }
+//                    try {
+//                        Thread.sleep(500);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//                Log.d("iter", String.valueOf(iter));
+//                textbay.setText("Guess: "+String.valueOf(guess));
+//                textbay.setTextColor(Color.BLACK);
+//            }
+//        });
 
         final Handler initHandler = new Handler();  // delay this task, prevent app from crash
         initHandler.postDelayed(new Runnable() {
@@ -403,7 +489,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         double deviation = 0;
         double mean;
         double WALK_LIMIT = 0.10;
-        double STEP_LIMIT = 0.07;
+        double STEP_LIMIT = 0.06;
 
 
         if(samplecounter == windowsize-1) {
@@ -449,7 +535,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 
-        maskBitmap3 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_3_v7 ,options);
+        maskBitmap3 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_3_v6 ,options);
         maskBitmap4 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_4_v6 ,options);
 
         maskBitmap = maskBitmap3;
@@ -469,6 +555,99 @@ public class MainActivity extends Activity implements SensorEventListener {
         myview.onDraw(canvas);
 
         floorplan.setImageBitmap(imageBitmap);
+
+
+        final Handler continuousBayesian = new Handler();  // set a handler for updating the points in every "delaymilis" time period, code from stackoverflow
+        continuousBayesian.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                BufferedReader reader = null;
+                InputStream rawRes = getResources().openRawResource(R.raw.radio_map1);
+                try {
+                    reader = new BufferedReader(new InputStreamReader(rawRes, "UTF8"));//换成你的文件名
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                Bayesian bayes1 = new Bayesian();
+
+//                bayes1.chooseRadioMap(azimuth); // this is new
+
+
+                bayes1.getRadioMap(reader);
+                bayes1.initialize();
+                radioMap1 = bayes1.radioMap;
+                int iter = 1;
+                int guess = -1;
+                double proba = 0.0;
+                Object[] temp;
+                Map<String, Integer> wif_data ;
+                while(proba <= 0.9){
+                    wif_data = getWifiData(radioMap1);
+                    temp = bayes1.bayes(wif_data);
+                    guess = (int)temp[1];
+                    proba = (double)temp[0];
+                    if (iter >= 20){
+                        break;
+                    }
+                    else if(iter>=14 && proba<=0.4){
+                        iter = 1;
+                        bayes1.initialize();
+                        proba = 0.0;
+
+                    }
+                    else{
+                        iter++;
+                    }
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                Log.d("iter", String.valueOf(iter));
+//                textbay.setText("Guess: "+String.valueOf(guess));
+//                textbay.setTextColor(Color.RED);
+
+                bayesians[bayesiansamplecounter] = guess;
+                Log.d("guess", String.valueOf(guess));
+                Log.d("bayesiansamplecounter", String.valueOf(bayesiansamplecounter));
+
+                if(bayesiansamplecounter == bayesianSize-1) {
+                    // do  stuff
+
+                    int threecounter = 0;
+                    int fourconuter = 0;
+
+                    for (int i=0; i<bayesianSize; i++) {
+                        if(bayesians[i] == 17 || bayesians[i] == 19 || bayesians[i] == 19) threecounter++;
+                        else fourconuter++;
+                    }
+
+                    if(threecounter > fourconuter) {
+                        Log.d("floor","floor4");
+                        floor = 3;
+                        changeFloor();
+                    }
+                    else {
+                        Log.d("floor::","floor3");
+                        floor = 4;
+                        changeFloor();
+                    }
+
+                    bayesiansamplecounter = 0;
+
+
+                }
+                else {
+                    Log.d("here","-----------");
+//                    bayesians[bayesiansamplecounter] = guess;
+
+                    bayesiansamplecounter++;
+                }
+
+                continuousBayesian.postDelayed(this,200);
+            }
+        }, 0);  //the time is in miliseconds
 
 
 
@@ -553,7 +732,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 
 
-    public Map<String, Integer> getWifiData(Map<String, float[][]> radioMap){
+    public Map<String, Integer> getWifiData(Map<String, float[][]> radioMap) {
         Map<String, Integer> data = new HashMap<>();
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         // Start a wifi scan
@@ -567,6 +746,44 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         }
         return data;
+    }
+
+    public Map<String, Integer> getWifiDataNew(Map<String, float[][]>[] radioMap) {
+        Map<String, Integer> data = new HashMap<>();
+        wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        // Start a wifi scan
+        Map<String, ArrayList<Integer>> wifiData = new HashMap<>();
+        wifiManager.startScan();
+        // Store results in a list.
+        List<ScanResult> scanResults = wifiManager.getScanResults();
+        for (ScanResult scanResult : scanResults) {
+            if (AP_filter.contains(scanResult.SSID) && (radioMap[0].containsKey(scanResult.BSSID) ||
+                    radioMap[1].containsKey(scanResult.BSSID) ||
+                    radioMap[2].containsKey(scanResult.BSSID) ||
+                    radioMap[3].containsKey(scanResult.BSSID)
+            )) {
+                data.put(scanResult.BSSID, scanResult.level);
+            }
+        }
+        return data;
+    }
+
+    public String getDirection(double angle){
+        double Q1 = -1.41; // value at pi/8
+        double Q2 = 0.15; // value at 3/pi*8
+        double Q3 = 1.72; // value at 5*pi/8
+
+        if (angle > -Math.PI && angle < Q1){
+            return "North";
+        } else if (angle > Q1 && angle < Q2){
+            return "East";
+        } else if (angle > Q2 && angle < Q3){
+            return "South";
+        }
+        else{
+            return "West";
+        }
+
     }
 
 }
