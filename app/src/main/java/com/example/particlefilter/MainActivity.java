@@ -535,7 +535,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 
-        maskBitmap3 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_3_v6 ,options);
+        maskBitmap3 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_3_v7 ,options);
         maskBitmap4 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_4_v6 ,options);
 
         maskBitmap = maskBitmap3;
