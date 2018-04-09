@@ -51,6 +51,20 @@
                 android:textAlignment="center" />
 
             <Button
+                android:id="@+id/Bayesd"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="Bayes=d" />
+
+            <TextView
+                android:id="@+id/textBayesD"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textAlignment="center" />
+
+            <Button
                 android:id="@+id/reset"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
