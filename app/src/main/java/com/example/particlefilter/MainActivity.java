@@ -1,7 +1,6 @@
 package com.example.particlefilter;
 
 import android.app.Activity;
-import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -14,18 +13,14 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import java.util.Arrays;
 import android.os.Environment;
-import org.apache.commons.lang3.ArrayUtils;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.File;
@@ -34,7 +29,6 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,10 +36,8 @@ import java.lang.Thread;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Bitmap;
-import java.util.Timer;
 import java.util.List;
-import java.util.Arrays;
-import java.util.Collections;
+
 
 
 
@@ -59,9 +51,9 @@ public class MainActivity extends Activity implements SensorEventListener {
     private List<String> AP_filter = Arrays.asList(AP_filter1);
 //    private int floorTestsNum = 0;
 
-    private Sensor accelerometer;
+
     private Sensor linearaccelerometer;
-    private Sensor magnetometer, gamerotation;
+    private Sensor gamerotation;
     private Map<String, float[][]> radioMap1;
 
 
@@ -82,14 +74,6 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 
     String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-
-    private final float[] mAccelerometerReading = new float[3];
-    private final float[] mMagnetometerReading = new float[3];
-
-    private final float[] mRotationMatrix = new float[9];
-    private final float[] mOrientationAngles = new float[3];
-
-    private final float[] mGameRotation = new float[9];
 
 
     public double azimuth;
@@ -178,12 +162,8 @@ public class MainActivity extends Activity implements SensorEventListener {
         }
 
 
-
-
-
         // Set the wifi manager
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-
 
         buttonReset.setOnClickListener(new OnClickListener() {
             @Override
@@ -409,27 +389,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
 
-    public double updateOrientationAngles() {
-        // Update rotation matrix, which is needed to update orientation angles.
-        Runnable runnable = new Runnable() {
-
-            public void run() {
-
-                SensorManager.getRotationMatrix(mRotationMatrix, null,
-                        mAccelerometerReading, mMagnetometerReading);
-
-                SensorManager.getOrientation(mRotationMatrix, mOrientationAngles);
-
-            }
-        };
-        new Thread(runnable).start();
-
-
-        textaz.setText("Azimuth: "+mOrientationAngles[0]);
-
-        return mOrientationAngles[0];
-
-    }
 
     public void motionSensor(double accmagnitude) {
 
