@@ -86,7 +86,7 @@ public class MainActivity extends Activity implements SensorEventListener {
     private int samplecounter = 0;
     private double sum = 0;
 
-    boolean iswalking = false;
+    static boolean iswalking = false;
 
     public static Bitmap imageBitmap;
     public static Bitmap maskBitmap,maskBitmap3,maskBitmap4;
@@ -401,6 +401,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         double mean;
         double WALK_LIMIT = 0.10;
         double STEP_LIMIT = 0.06;
+        double CLIMB_LIMIT = 0.3;
 
 
         if(samplecounter == windowsize-1) {
@@ -418,6 +419,11 @@ public class MainActivity extends Activity implements SensorEventListener {
                 textstep.setText("Standing");
                 iswalking = false;
             }
+            if (deviation > CLIMB_LIMIT) {
+
+                int climbcntr = myview.checkZone();
+                textstep.setText("Climbing"+climbcntr);
+            }
 
             sum = 0;
             samplecounter = 0;
@@ -431,6 +437,8 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         }
     }
+
+    public static void setIswalking(boolean walking){ iswalking = walking;}
 
 
     public void initCanvas(){   // stackoverflow code
@@ -577,12 +585,12 @@ public class MainActivity extends Activity implements SensorEventListener {
     }
 
 
-    public void changeFloor(){
+    public static void changeFloor(){
 
         if (floor == 3){
 
             floor = 4;
-            myview.setINITIAL_SPEED(73);
+            //myview.setINITIAL_SPEED(73);
             floorplan.setBackgroundResource(R.drawable.floorplan_final_4_v3);
             //floorplan.setImageResource(R.drawable.floorplan_final_4_v2);
             floorplan.setImageBitmap(imageBitmap);
@@ -590,7 +598,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         } else {
 
             floor = 3;
-            myview.setINITIAL_SPEED(80);
+            //myview.setINITIAL_SPEED(80);
             floorplan.setBackgroundResource(R.drawable.floorplan_final_3_v3);
             //floorplan.setImageResource(R.drawable.floorplan_final_3_v2);
             floorplan.setImageBitmap(imageBitmap);

@@ -34,6 +34,8 @@ public class MyView extends View {   // stackoverflow code
     ArrayList<Rect> zones = new ArrayList<>();
     int[] zoneCounter;
 
+    int climbcounter = 0;
+
     int aliveSize;
 
 
@@ -78,6 +80,7 @@ public class MyView extends View {   // stackoverflow code
         // Load attributes
         paint = new Paint();
         paint.setColor(Color.RED);
+        //populate16();
         //populateArrayList();
         populateParticles();
         populateRect();
@@ -176,6 +179,24 @@ public class MyView extends View {   // stackoverflow code
         return max;
     }
 
+   public int checkZone(){
+
+        if (mostPopulated[0] == 16){
+            climbcounter ++;
+            MainActivity.setIswalking(false);
+        }
+        if (mostPopulated[0] == 17){
+            climbcounter ++;
+            MainActivity.setIswalking(false);
+        }
+        if (climbcounter > 3){
+            climbcounter = 0;
+            MainActivity.changeFloor();
+        }
+
+        return climbcounter;
+    }
+
 
 
     @Override
@@ -218,7 +239,43 @@ public class MyView extends View {   // stackoverflow code
         particles.add(new Particle(1642, 456, 0, 0.4, 0));
     }
 
-    public static double getInitialAngle(){ return INITIAL_ANGLE;}
+        public int populate16(){
+
+            particles.clear();
+
+            int cntr = 0;
+            int STEP = 10;
+            Bitmap mask = MainActivity.getMaskBitmap();
+
+            double[] speedvector = {-5,-2,0,2,5};
+            double[] anglevector = {-0.5,-0.2,0,0.2,0.5};
+
+            zones.add(new Rect(1040, 183, 1168, 400)); // 16
+
+            for (int i = 1050; i < 1170;i=i+STEP){
+                for (int j = 183; j < 400;j=j+STEP){
+
+                    int color = mask.getPixel(i*3,j*3);
+                    int redcomponent = (color >> 16) & 0xff;
+
+                    if ((redcomponent) == 255) {
+
+                        for (int speed = 0; speed < speedvector.length; speed++){
+                            for (int angle = 0; angle < anglevector.length; angle++){
+
+                                particles.add(new Particle(i, j, anglevector[angle], 0.1, speedvector[speed]));
+                                //Log.d("add "," index: "+cntr+" x: "+String.valueOf(i)+" y "+String.valueOf(j)+" angleerr: "+ String.valueOf(anglevector[angle])+" speederr: "+String.valueOf(speedvector[speed]));
+                                cntr++;
+
+                            }
+                        }
+                    }
+                }
+            }
+
+            return cntr;
+
+        }
 
 
     public int populateParticles(){
