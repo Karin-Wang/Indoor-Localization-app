@@ -154,7 +154,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             // register 'this' as a listener that updates values. Each time a sensor value changes,
             // the method 'onSensorChanged()' is called.
             sensorManager.registerListener(this, gamerotation,
-                    SensorManager.SENSOR_DELAY_NORMAL);
+                    SensorManager.SENSOR_DELAY_GAME);
 
 
         } else {
@@ -325,7 +325,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         sensorManager.registerListener(this, linearaccelerometer,
                 SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(this, gamerotation,
-                SensorManager.SENSOR_DELAY_NORMAL);
+                SensorManager.SENSOR_DELAY_GAME);
     }
 
     // onPause() unregisters the accelerometer for stop listening the events
@@ -357,8 +357,8 @@ public class MainActivity extends Activity implements SensorEventListener {
             azimuth = Math.PI*-event.values[2];
 
             String az = String.valueOf(azimuth);
-            //textaz.setText(String.valueOf(azimuth).substring(0,4));
-            //Log.d("Game rotation: ", String.valueOf(az.length()));
+            textaz.setText(az.substring(0,4));
+            //Log.d("Game rotation: ", String.valueOf(az));
 
         }
     }
