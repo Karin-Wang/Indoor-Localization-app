@@ -61,7 +61,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     private Sensor accelerometer;
     private Sensor linearaccelerometer;
-    private Sensor magnetometer;
+    private Sensor magnetometer, gamerotation;
     private Map<String, float[][]> radioMap1;
 
 
@@ -88,6 +88,10 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     private final float[] mRotationMatrix = new float[9];
     private final float[] mOrientationAngles = new float[3];
+
+    private final float[] mGameRotation = new float[9];
+
+
     public double azimuth;
 
 
@@ -110,11 +114,6 @@ public class MainActivity extends Activity implements SensorEventListener {
     public static ImageView floorplan;
     MyView myview;
     public static TextView textzone;
-
-
-
-
-
 
 
 
@@ -143,19 +142,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         // Set the sensor manager
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        // if the default accelerometer exists
-        if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
-            // set accelerometer
-            accelerometer = sensorManager
-                    .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-            // register 'this' as a listener that updates values. Each time a sensor value changes,
-            // the method 'onSensorChanged()' is called.
-            sensorManager.registerListener(this, accelerometer,
-                    SensorManager.SENSOR_DELAY_NORMAL);
-
-        } else {
-            // No accelerometer!
-        }
 
         // if the default accelerometer exists
         if (sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION) != null) {
@@ -177,14 +163,13 @@ public class MainActivity extends Activity implements SensorEventListener {
                     SensorManager.SENSOR_DELAY_NORMAL);
         }
 
-        // if the default magnetometer exists
-        if (sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD) != null) {
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR) != null) {
             // set accelerometer
-            magnetometer = sensorManager
-                    .getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+            gamerotation= sensorManager
+                    .getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
             // register 'this' as a listener that updates values. Each time a sensor value changes,
             // the method 'onSensorChanged()' is called.
-            sensorManager.registerListener(this, magnetometer,
+            sensorManager.registerListener(this, gamerotation,
                     SensorManager.SENSOR_DELAY_NORMAL);
 
 
@@ -195,38 +180,10 @@ public class MainActivity extends Activity implements SensorEventListener {
 
 
 
+
         // Set the wifi manager
         wifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 
-        // Create a click listener for acc recorder button.
-        /*buttonAccRecord.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String fileNameAcc;
-                if (!isRecord) {
-                    isRecord = true;
-                    buttonAccRecord.setText("STOP RECORD");
-                } else {
-                    isRecord = false;
-                    buttonAccRecord.setText("START RECORD");
-                    String curTime = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()); // time at first call
-                    fileNameAcc = "accData_" + curTime + ".csv";
-                    String row ="Acceleration Y, Accelearion Z, timestamp\n";   // write header to csv file
-                    try {
-                        File sdCard = Environment.getExternalStorageDirectory();
-                        File dir = new File(sdCard.getAbsolutePath() + "/localization");
-                        dir.mkdir();
-                        File file = new File(dir, fileNameAcc);
-                        FileOutputStream f = new FileOutputStream(file,true);
-                        f.write(row.getBytes());
-                        f.flush();
-                        f.close();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });*/
 
         buttonReset.setOnClickListener(new OnClickListener() {
             @Override
@@ -385,11 +342,9 @@ public class MainActivity extends Activity implements SensorEventListener {
     // onResume() registers the accelerometer for listening the events
     protected void onResume() {
         super.onResume();
-        sensorManager.registerListener(this, accelerometer,
-                SensorManager.SENSOR_DELAY_NORMAL);
-        sensorManager.registerListener(this, magnetometer,
-                SensorManager.SENSOR_DELAY_NORMAL);
         sensorManager.registerListener(this, linearaccelerometer,
+                SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, gamerotation,
                 SensorManager.SENSOR_DELAY_NORMAL);
     }
 
@@ -409,25 +364,19 @@ public class MainActivity extends Activity implements SensorEventListener {
     public void onSensorChanged(SensorEvent event) {
 
 
-        if (event.sensor == accelerometer) {
-            System.arraycopy(event.values, 0, mAccelerometerReading,
-                    0, mAccelerometerReading.length);
-
-            azimuth = updateOrientationAngles(); // when new acc data arrives, update angles
-
-        }
-        else if (event.sensor == magnetometer) {
-            System.arraycopy(event.values, 0, mMagnetometerReading,
-                    0, mMagnetometerReading.length);
-        }
-
-
-        else if (event.sensor == linearaccelerometer) {
+        if (event.sensor == linearaccelerometer) {
 
             accmagnitude = Math.sqrt(event.values[0]*event.values[0]+event.values[2]*event.values[2]); // phone in horizontal pos, only z and y matters
             timestamp = event.timestamp;
             if(isRecord)writeAccValuesCSV(accmagnitude,timestamp);
             motionSensor(accmagnitude);
+        }
+
+        else if (event.sensor == gamerotation) {
+
+            azimuth = Math.PI*event.values[2];
+            Log.d("Game rotation: ", String.valueOf(azimuth));
+
         }
     }
 
@@ -535,8 +484,8 @@ public class MainActivity extends Activity implements SensorEventListener {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 
-        maskBitmap3 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_3_v7 ,options);
-        maskBitmap4 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_4_v6 ,options);
+        maskBitmap3 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_3_v8 ,options);
+        maskBitmap4 = BitmapFactory.decodeResource(getResources(), R.drawable.floorplan_mask_4_v8 ,options);
 
         maskBitmap = maskBitmap3;
 
@@ -548,7 +497,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         p.setColor(Color.RED);
 
 
-        floorplan.setBackgroundResource(R.drawable.floorplan_final_3_v3);
+        floorplan.setBackgroundResource(R.drawable.floorplan_final_4_v3);
 
         myview = new MyView(getApplicationContext());
 
@@ -604,13 +553,13 @@ public class MainActivity extends Activity implements SensorEventListener {
                         e.printStackTrace();
                     }
                 }
-                Log.d("iter", String.valueOf(iter));
+                //Log.d("iter", String.valueOf(iter));
 //                textbay.setText("Guess: "+String.valueOf(guess));
 //                textbay.setTextColor(Color.RED);
 
                 bayesians[bayesiansamplecounter] = guess;
-                Log.d("guess", String.valueOf(guess));
-                Log.d("bayesiansamplecounter", String.valueOf(bayesiansamplecounter));
+                //Log.d("guess", String.valueOf(guess));
+                //Log.d("bayesiansamplecounter", String.valueOf(bayesiansamplecounter));
 
                 if(bayesiansamplecounter == bayesianSize-1) {
                     // do  stuff
@@ -624,14 +573,14 @@ public class MainActivity extends Activity implements SensorEventListener {
                     }
 
                     if(threecounter > fourconuter) {
-                        Log.d("floor","floor4");
-                        floor = 3;
-                        changeFloor();
+                        //Log.d("floor","floor4");
+                        //floor = 3;
+                        //changeFloor();
                     }
                     else {
-                        Log.d("floor::","floor3");
-                        floor = 4;
-                        changeFloor();
+                        //Log.d("floor::","floor3");
+                        //floor = 4;
+                        //changeFloor();
                     }
 
                     bayesiansamplecounter = 0;
@@ -639,7 +588,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
                 }
                 else {
-                    Log.d("here","-----------");
+                    //Log.d("here","-----------");
 //                    bayesians[bayesiansamplecounter] = guess;
 
                     bayesiansamplecounter++;
@@ -671,6 +620,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         if (floor == 3){
 
             floor = 4;
+            myview.setINITIAL_SPEED(73);
             floorplan.setBackgroundResource(R.drawable.floorplan_final_4_v3);
             //floorplan.setImageResource(R.drawable.floorplan_final_4_v2);
             floorplan.setImageBitmap(imageBitmap);
@@ -678,6 +628,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         } else {
 
             floor = 3;
+            myview.setINITIAL_SPEED(80);
             floorplan.setBackgroundResource(R.drawable.floorplan_final_3_v3);
             //floorplan.setImageResource(R.drawable.floorplan_final_3_v2);
             floorplan.setImageBitmap(imageBitmap);

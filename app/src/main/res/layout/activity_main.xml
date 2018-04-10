@@ -39,9 +39,9 @@
             <Button
                 android:id="@+id/bayes"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="Bayes" />
+                android:layout_height="wrap_content"
+                android:layout_weight="1.05"
+                android:text="B" />
 
             <TextView
                 android:id="@+id/textBAYESIAN"
@@ -53,9 +53,9 @@
             <Button
                 android:id="@+id/Bayesd"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:text="Bayes=d" />
+                android:layout_height="wrap_content"
+                android:layout_weight="1.04"
+                android:text="B D" />
 
             <TextView
                 android:id="@+id/textBayesD"
@@ -68,14 +68,14 @@
                 android:id="@+id/reset"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0.99"
+                android:layout_weight="0.96"
                 android:text="Reset PF" />
 
             <TextView
                 android:id="@+id/textZone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="1.05"
                 android:text="PF: 18"
                 android:textAlignment="center" />
 
@@ -83,21 +83,21 @@
                 android:id="@+id/textSTEPCOUNT"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="1.04"
                 android:textAlignment="center" />
 
             <TextView
                 android:id="@+id/textROTAZ"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:textAlignment="center" />
 
             <ToggleButton
                 android:id="@+id/toggleFloor"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_weight=".97"
                 android:checked="false"
                 android:text="Floor"
                 android:textOff="Floor 3"

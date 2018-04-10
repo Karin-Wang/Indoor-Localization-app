@@ -46,8 +46,12 @@ public class MyView extends View {   // stackoverflow code
     public float y;
     public int radius = 20;
 
-    public  static double INITIAL_ANGLE = 1.8;
-    public  static double INITIAL_SPEED = 50;
+    public static double INITIAL_ANGLE = 2.1;
+    public static double INITIAL_SPEED = 71;
+
+    public void setINITIAL_SPEED(double initial_speed) {
+        INITIAL_SPEED = initial_speed;
+    }
 
     public MyView(Context context) {
         super(context);
@@ -221,11 +225,11 @@ public class MyView extends View {   // stackoverflow code
         particles.clear();
 
         int cntr = 0;
-        int STEP = 50;
+        int STEP = 40;
         Bitmap mask = MainActivity.getMaskBitmap();
 
-        double[] speedvector = {-2,-0.75,0,0.75,2};
-        double[] anglevector = {-0.4,-0.25,0,0.25,0.4};
+        double[] speedvector = {-5,-2,0,2,5};
+        double[] anglevector = {-0.5,-0.2,0,0.2,0.5};
 
         for (int i = 0; i < mask.getWidth()/3;i=i+STEP){
             for (int j = 0; j < mask.getHeight()/3;j=j+STEP){
@@ -313,7 +317,7 @@ public class MyView extends View {   // stackoverflow code
                         if(curParticle.x > maskBitmap.getWidth()) curParticle.x =  maskBitmap.getWidth()-65;
                         if(curParticle.y > maskBitmap.getHeight()) curParticle.y =  maskBitmap.getHeight()-65;
 
-                        Log.d("particle:", String.valueOf(curParticle.x));
+                        //Log.d("particle:", String.valueOf(curParticle.x));
 
                         int color = 0;
 
