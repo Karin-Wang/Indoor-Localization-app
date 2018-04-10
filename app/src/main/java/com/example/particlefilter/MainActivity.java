@@ -354,8 +354,11 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         else if (event.sensor == gamerotation) {
 
-            azimuth = Math.PI*event.values[2];
-            Log.d("Game rotation: ", String.valueOf(azimuth));
+            azimuth = Math.PI*-event.values[2];
+
+            String az = String.valueOf(azimuth);
+            //textaz.setText(String.valueOf(azimuth).substring(0,4));
+            //Log.d("Game rotation: ", String.valueOf(az.length()));
 
         }
     }

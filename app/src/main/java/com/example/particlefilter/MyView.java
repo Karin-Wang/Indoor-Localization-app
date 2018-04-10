@@ -46,7 +46,7 @@ public class MyView extends View {   // stackoverflow code
     public float y;
     public int radius = 20;
 
-    public static double INITIAL_ANGLE = 2.1;
+    public static double INITIAL_ANGLE = 0;
     public static double INITIAL_SPEED = 71;
 
     public void setINITIAL_SPEED(double initial_speed) {
