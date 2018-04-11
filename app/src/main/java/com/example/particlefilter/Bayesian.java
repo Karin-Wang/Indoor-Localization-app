@@ -40,7 +40,7 @@ public class Bayesian {
     private int maxIter = 10;
     String filename = "r";
 
-    private int predict;
+    int predict;
     double[][] prior;
     double[][] post;
     int iteration;
@@ -166,15 +166,19 @@ public class Bayesian {
             }
             for (int cell = 0; cell < 19; cell++) {
                 String AP = sorted_test_data.get(item).getKey();
-                if (radioMap.get(AP)[cell][1] == 0.0){
-                    pdf[cell] = 0.0;
-                }
-                else {
-                    NormalDistribution d = new NormalDistribution(radioMap.get(AP)[cell][0], radioMap.get(AP)[cell][1]);
-                    pdf[cell] = d.density(normalization((test_data.get(AP))));
-                    if (Double.isNaN(pdf[cell])) {
+                if (radioMap.containsKey(AP)) {
+                    if (radioMap.get(AP)[cell][1] == 0.0) {
                         pdf[cell] = 0.0;
+                    } else {
+                        NormalDistribution d = new NormalDistribution(radioMap.get(AP)[cell][0], radioMap.get(AP)[cell][1]);
+                        pdf[cell] = d.density(normalization((test_data.get(AP))));
+                        if (Double.isNaN(pdf[cell])) {
+                            pdf[cell] = 0.0;
+                        }
                     }
+                }
+                else{
+                    pdf[cell] = 0.0;
                 }
 //                Log.d("proba1", String.valueOf(pdf[cell]));
             }
