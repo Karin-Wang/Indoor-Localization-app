@@ -1,4 +1,4 @@
-package com.example.particlefilter;
+package com.example.bayesian;
 
 import android.content.Context;
 import android.graphics.Bitmap;
